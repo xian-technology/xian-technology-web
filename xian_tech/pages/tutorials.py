@@ -110,7 +110,9 @@ def seed():
     metadata['token_symbol'] = 'TUT'
     metadata['token_logo_url'] = ''
     metadata['token_website'] = ''
+    # Operator governs privileged metadata changes.
     metadata['operator'] = ctx.caller
+    # Mint initial supply to deployer.
     balances[ctx.caller] = 1_000_000'''
 
 TOKEN_STEP_3 = '''# Standard read endpoint.
@@ -138,6 +140,7 @@ def transfer_from(amount: float, to: str, main_account: str):
     assert amount > 0, 'amount must be positive'
     assert approvals[main_account, ctx.caller] >= amount, 'not approved'
     assert balances[main_account] >= amount, 'insufficient funds'
+    # Consume allowance before moving funds.
     approvals[main_account, ctx.caller] -= amount
     balances[main_account] -= amount
     balances[to] += amount'''
@@ -160,7 +163,9 @@ def seed():
     metadata['token_symbol'] = 'TUT'
     metadata['token_logo_url'] = ''
     metadata['token_website'] = ''
+    # Operator governs privileged metadata changes.
     metadata['operator'] = ctx.caller
+    # Mint initial supply to deployer.
     balances[ctx.caller] = 1_000_000
 
 # Stage 3: Read holder balance.
@@ -188,6 +193,7 @@ def transfer_from(amount: float, to: str, main_account: str):
     assert amount > 0, 'amount must be positive'
     assert approvals[main_account, ctx.caller] >= amount, 'not approved'
     assert balances[main_account] >= amount, 'insufficient funds'
+    # Consume allowance before moving funds.
     approvals[main_account, ctx.caller] -= amount
     balances[main_account] -= amount
     balances[to] += amount
@@ -199,9 +205,7 @@ def change_metadata(key: str, value):
     metadata[key] = value'''
 
 # Scenario 3: multisig.
-MULTISIG_STEP_1 = '''import importlib
-
-# Core multisig state.
+MULTISIG_STEP_1 = '''# Core multisig state.
 owners = Hash(default_value=False)
 required_approvals = Variable()
 proposal_count = Variable()
@@ -225,6 +229,7 @@ def propose_transfer(token_contract: str, to: str, amount: float):
     assert_owner()
     assert amount > 0, 'amount must be positive'
 
+    # Allocate sequential proposal IDs.
     proposal_id = proposal_count.get()
     proposal_count.set(proposal_id + 1)
 
@@ -251,21 +256,21 @@ def approve_transfer(proposal_id: int):
     approvals[proposal_id, ctx.caller] = True
     approval_totals[proposal_id] += 1
 
+    # Execute immediately once threshold is reached.
     if approval_totals[proposal_id] >= required_approvals.get():
         execute_transfer(proposal_id)'''
 
 MULTISIG_STEP_5 = '''# Internal execution step that performs the token transfer.
 def execute_transfer(proposal_id: int):
     proposal = proposals[proposal_id]
+    # `importlib` is injected by Contracting runtime.
     token = importlib.import_module(proposal['token_contract'])
     token.transfer(amount=proposal['amount'], to=proposal['to'])
 
     proposal['executed'] = True
     proposals[proposal_id] = proposal'''
 
-MULTISIG_FULL = '''import importlib
-
-# Stage 1: Core multisig state.
+MULTISIG_FULL = '''# Stage 1: Core multisig state.
 owners = Hash(default_value=False)
 required_approvals = Variable()
 proposal_count = Variable()
@@ -293,6 +298,7 @@ def propose_transfer(token_contract: str, to: str, amount: float):
     assert_owner()
     assert amount > 0, 'amount must be positive'
 
+    # Allocate sequential proposal IDs.
     proposal_id = proposal_count.get()
     proposal_count.set(proposal_id + 1)
 
@@ -319,12 +325,14 @@ def approve_transfer(proposal_id: int):
     approvals[proposal_id, ctx.caller] = True
     approval_totals[proposal_id] += 1
 
+    # Execute immediately once threshold is reached.
     if approval_totals[proposal_id] >= required_approvals.get():
         execute_transfer(proposal_id)
 
 # Stage 6: Execute transfer from this contract balance.
 def execute_transfer(proposal_id: int):
     proposal = proposals[proposal_id]
+    # `importlib` is injected by Contracting runtime.
     token = importlib.import_module(proposal['token_contract'])
     token.transfer(amount=proposal['amount'], to=proposal['to'])
 
@@ -375,9 +383,7 @@ def increment(step: int = 1):
 def current():
     return count.get()'''
 
-UPGRADE_ROUTER_STEP_1 = '''import importlib
-
-# Router state: admin + active implementation target.
+UPGRADE_ROUTER_STEP_1 = '''# Router state: admin + active implementation target.
 admin = Variable()
 active_contract = Variable()'''
 
@@ -390,12 +396,14 @@ def seed(initial_contract: str = 'con_counter_v1'):
 UPGRADE_ROUTER_STEP_3 = '''# Forward write calls to the active implementation.
 @export
 def increment(step: int = 1):
+    # `importlib` is injected by Contracting runtime.
     target = importlib.import_module(active_contract.get())
     return target.increment(step=step)
 
 # Forward read calls to the active implementation.
 @export
 def current():
+    # `importlib` is injected by Contracting runtime.
     target = importlib.import_module(active_contract.get())
     return target.current()'''
 
@@ -410,9 +418,7 @@ UPGRADE_ROUTER_STEP_5 = '''# Visibility helper for clients and tooling.
 def get_active_contract():
     return active_contract.get()'''
 
-UPGRADE_ROUTER_FULL = '''import importlib
-
-# Stage 1: Router state.
+UPGRADE_ROUTER_FULL = '''# Stage 1: Router state.
 admin = Variable()
 active_contract = Variable()
 
@@ -425,12 +431,14 @@ def seed(initial_contract: str = 'con_counter_v1'):
 # Stage 3: Forward write calls to active target.
 @export
 def increment(step: int = 1):
+    # `importlib` is injected by Contracting runtime.
     target = importlib.import_module(active_contract.get())
     return target.increment(step=step)
 
 # Stage 4: Forward read calls to active target.
 @export
 def current():
+    # `importlib` is injected by Contracting runtime.
     target = importlib.import_module(active_contract.get())
     return target.current()
 
@@ -763,22 +771,22 @@ def tutorials_page() -> rx.Component:
                     _tutorial_step(
                         1,
                         "Declare persistent state",
-                        why="Contract state must be declared up front so values persist between transactions.",
-                        how="Use a `Hash` for key-value records.",
+                        why="Contract state must be declared at module scope so values persist between transactions and remain queryable by clients.",
+                        how="Use a `Hash` for key-value records so each key can be addressed independently and updated without rewriting unrelated state.",
                         snippet=STORE_DATA_STEP_1,
                     ),
                     _tutorial_step(
                         2,
                         "Implement the write path",
-                        why="All on-chain mutations should validate input before writing, because writes consume stamps.",
-                        how="Create a `save(key, value)` export and store into `records[key]`.",
+                        why="Validate all on-chain mutations before writes: writes consume stamps, and Contracting has no `try/except` recovery.",
+                        how="Create a `save(key, value)` export, guard invalid input with `assert`, then write to `records[key]` in one explicit mutation path.",
                         snippet=STORE_DATA_STEP_2,
                     ),
                     _tutorial_step(
                         3,
                         "Implement the read path",
-                        why="Read functions provide deterministic state access and are the public API for consumers.",
-                        how="Create `read(key)` that returns `records[key]`.",
+                        why="Read functions are the stable external API for wallets, indexers, and apps that need deterministic state access.",
+                        how="Create `read(key)` that returns `records[key]`; with `default_value=''`, missing keys return an empty string instead of failing.",
                         snippet=STORE_DATA_STEP_3,
                     ),
                     spacing="4",
@@ -838,36 +846,36 @@ def tutorials_page() -> rx.Component:
                     _tutorial_step(
                         1,
                         "Define required storage",
-                        why="A token needs balances, delegated spending records, and metadata to be discoverable.",
-                        how="Use `balances`, `approvals`, and `metadata` hashes as the base storage model.",
+                        why="Tokens need balances, delegated spending records, and metadata so wallets show holdings and integrations route calls predictably.",
+                        how="Use `balances`, `approvals`, and `metadata` hashes as the base model; this maps to transfer, allowance, and token-info read paths.",
                         snippet=TOKEN_STEP_1,
                     ),
                     _tutorial_step(
                         2,
                         "Seed metadata and initial supply",
-                        why="A token needs immutable-looking defaults at deployment: name, symbol, operator, and initial distribution.",
-                        how="In `seed`, set metadata fields and mint initial supply to deployer.",
+                        why="Set canonical defaults at deployment so downstream tools get a stable symbol/name and governance authority from block one.",
+                        how="In `seed`, set metadata fields, assign `operator`, and mint initial supply to the deployer address for deterministic initial ownership.",
                         snippet=TOKEN_STEP_2,
                     ),
                     _tutorial_step(
                         3,
                         "Implement holder balance and direct transfer",
-                        why="`balance_of` and `transfer` are the core user actions for wallets and apps.",
-                        how="Return balances by account and update sender/receiver values with guard assertions.",
+                        why="`balance_of` and `transfer` are the core wallet actions, so they must be minimal, explicit, and easy to reason about.",
+                        how="Return balances by account and move funds by debiting caller then crediting recipient with positive-amount and sufficient-balance guards.",
                         snippet=TOKEN_STEP_3,
                     ),
                     _tutorial_step(
                         4,
                         "Add delegated transfer behavior",
-                        why="Integrations like DEXes need allowance-based movement on behalf of a user.",
-                        how="Use `approve` to set allowance and `transfer_from` to consume it safely.",
+                        why="DEXes and routers often execute on behalf of users, so allowance-based delegation is required for composability.",
+                        how="Use `approve` to set spender allowance and `transfer_from` to validate and consume it before moving owner funds.",
                         snippet=TOKEN_STEP_4,
                     ),
                     _tutorial_step(
                         5,
                         "Gate metadata updates by operator",
-                        why="Only trusted governance/operator addresses should mutate token metadata.",
-                        how="Add `change_metadata` with an `operator` check.",
+                        why="Metadata is user-facing and should not be mutable by arbitrary callers, otherwise explorers and wallets can be spoofed or degraded.",
+                        how="Add `change_metadata` with an `operator` check so only governance authority can update mutable token fields.",
                         snippet=TOKEN_STEP_5,
                     ),
                     spacing="4",
@@ -911,36 +919,36 @@ def tutorials_page() -> rx.Component:
                     _tutorial_step(
                         1,
                         "Create owner + proposal state",
-                        why="Multisig needs explicit owner membership, per-proposal approvals, and threshold counters.",
-                        how="Use owner flags and proposal/approval hashes with numeric counters.",
+                        why="Multisig requires explicit ownership, per-proposal approval tracking, and deterministic counters to prevent ambiguous execution state.",
+                        how="Use owner flags plus proposal/approval hashes and counters so each proposal has an auditable lifecycle from creation to execution.",
                         snippet=MULTISIG_STEP_1,
                     ),
                     _tutorial_step(
                         2,
                         "Initialize owner set and threshold",
-                        why="Threshold is the main safety property, so it must be configured during deployment.",
-                        how="In `seed`, register owners and set `required_approvals`.",
+                        why="The approval threshold is the core safety boundary, so it must be fixed at deployment and validated immediately.",
+                        how="In `seed`, register each owner, assert a sane threshold, and initialize proposal counters so IDs are deterministic.",
                         snippet=MULTISIG_STEP_2,
                     ),
                     _tutorial_step(
                         3,
                         "Propose a transfer",
-                        why="Execution should start as a proposal so other owners can review before funds move.",
-                        how="Store proposal details and auto-approve by proposer.",
+                        why="Splitting proposal from execution creates a review window so funds cannot move in a single unilateral action.",
+                        how="Store transfer intent in `proposals` and auto-approve by proposer to reduce one extra approval transaction.",
                         snippet=MULTISIG_STEP_3,
                     ),
                     _tutorial_step(
                         4,
                         "Collect approvals",
-                        why="Each owner should only approve once; threshold crossing should trigger execution.",
-                        how="Track unique approvals per proposal and execute when count reaches requirement.",
+                        why="Each owner should approve at most once; duplicate approvals must be blocked to preserve threshold integrity.",
+                        how="Track approval flags by `(proposal_id, owner)` and trigger execution exactly when approval count reaches `required_approvals`.",
                         snippet=MULTISIG_STEP_4,
                     ),
                     _tutorial_step(
                         5,
                         "Execute by calling token contract",
-                        why="Treasury transfer occurs via contract-to-contract call once governance condition passes.",
-                        how="Import token via `importlib.import_module` and call `transfer`.",
+                        why="Once governance conditions pass, treasury movement should happen in one internal execution step that records completion.",
+                        how="Import contract via `importlib.import_module` and call `transfer`.",
                         snippet=MULTISIG_STEP_5,
                     ),
                     spacing="4",
@@ -948,12 +956,13 @@ def tutorials_page() -> rx.Component:
                     width="100%",
                 ),
                 rx.box(
-                    rx.text(
+                    text_with_inline_code(
                         "Operational note: this contract must hold token balance first (for example by direct transfer to `ctx.this`) "
                         "before proposals can execute outgoing transfers.",
                         size="3",
                         color=TEXT_MUTED,
                         line_height="1.6",
+                        width="100%",
                     ),
                     padding="1rem 1.25rem",
                     background=ACCENT_SOFT,
@@ -998,36 +1007,36 @@ def tutorials_page() -> rx.Component:
                     _tutorial_step(
                         1,
                         "Write implementation v1",
-                        why="Implementations should expose a stable interface that the router can call.",
-                        how="Start with a simple counter contract that defines `increment` and `current`.",
+                        why="Router upgrades are safest when implementations share a stable function interface from day one.",
+                        how="Start with a simple counter contract exposing `increment` and `current`; this becomes the interface contract callers depend on.",
                         snippet=UPGRADE_V1,
                     ),
                     _tutorial_step(
                         2,
                         "Write implementation v2 with same interface",
-                        why="Upgrades are safe when old and new implementations share function names and argument shapes.",
-                        how="Keep function signatures identical, but change internal logic in v2.",
+                        why="Keeping signatures identical allows upgrades without breaking client code that already integrates with the router.",
+                        how="Keep function names/arguments exactly the same while changing internal behavior in v2.",
                         snippet=UPGRADE_V2,
                     ),
                     _tutorial_step(
                         3,
                         "Declare router state",
-                        why="Router needs an admin and one pointer to current implementation.",
-                        how="Store `admin` and `active_contract` in Variables.",
+                        why="The router needs explicit authority and one canonical pointer to decide which implementation handles calls.",
+                        how="Store `admin` and `active_contract` in `Variable`s so upgrades are controlled and queryable on-chain.",
                         snippet=UPGRADE_ROUTER_STEP_1 + "\n\n" + UPGRADE_ROUTER_STEP_2,
                     ),
                     _tutorial_step(
                         4,
                         "Forward calls from router to implementation",
-                        why="This is the contract-to-contract call pattern that keeps a stable external contract address.",
-                        how="Import selected contract with `importlib.import_module` and call exported methods.",
+                        why="Forwarding preserves one stable entrypoint address while allowing implementation logic to evolve over time.",
+                        how="Load the selected implementation with `importlib.import_module`, then call the same exported method signatures on that target.",
                         snippet=UPGRADE_ROUTER_STEP_3,
                     ),
                     _tutorial_step(
                         5,
                         "Add controlled upgrade switch",
-                        why="Only one authority should decide when implementation changes.",
-                        how="Protect `set_active_contract` with an admin check and expose `get_active_contract` for observability.",
+                        why="Upgrade authority must be explicit; otherwise any caller could redirect execution to malicious contracts.",
+                        how="Protect `set_active_contract` with an admin check and expose `get_active_contract` so UIs and bots can verify active implementation.",
                         snippet=UPGRADE_ROUTER_STEP_4 + "\n\n" + UPGRADE_ROUTER_STEP_5,
                     ),
                     spacing="4",

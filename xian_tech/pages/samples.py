@@ -665,7 +665,7 @@ def samples_page() -> rx.Component:
                     ),
                     rx.text(
                         "If you need strict guarantees, run the action from your own contract and assert the final conditions there. "
-                        "When the result is outside your bounds, raise an error so the transaction reverts.",
+                        "When the result is outside your bounds, fail with an `assert` so the transaction reverts.",
                         size="3",
                         color=TEXT_MUTED,
                         line_height="1.6",
