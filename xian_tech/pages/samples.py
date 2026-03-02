@@ -545,17 +545,6 @@ def samples_page() -> rx.Component:
                 ),
                 rx.grid(
                     _scenario_jump_card(
-                        title="Reliable Transfer Confirmation",
-                        description="Send token transfers with bounded polling and explicit success checks.",
-                        target="scenario-transfer-confirmation",
-                        icon="send",
-                        bullets=[
-                            "Submit through xian-py",
-                            "Wait for tx with timeout",
-                            "Handle pending and failure paths",
-                        ],
-                    ),
-                    _scenario_jump_card(
                         title="Simulate, Stamp, Submit",
                         description="Preview simulated state deltas and only submit when expected output passes checks.",
                         target="scenario-contract-call-guardrails",
@@ -564,6 +553,17 @@ def samples_page() -> rx.Component:
                             "Inspect simulation state diff",
                             "Validate expected output first",
                             "Reuse simulated stamp budget",
+                        ],
+                    ),
+                    _scenario_jump_card(
+                        title="Reliable Transfer Confirmation",
+                        description="Send token transfers with bounded polling and explicit success checks.",
+                        target="scenario-transfer-confirmation",
+                        icon="send",
+                        bullets=[
+                            "Submit through xian-py",
+                            "Wait for tx with timeout",
+                            "Handle pending and failure paths",
                         ],
                     ),
                     _scenario_jump_card(
@@ -588,7 +588,101 @@ def samples_page() -> rx.Component:
             section_panel(
                 rx.vstack(
                     linked_heading(
-                        "Scenario 1: Reliable Transfer Confirmation",
+                        "Scenario 1: Simulate, Stamp, Submit",
+                        anchor_id="scenario-contract-call-guardrails",
+                        size="6",
+                        color=TEXT_PRIMARY,
+                        weight="bold",
+                    ),
+                    rx.text(
+                        "For state-changing calls like a DEX buy, simulate first, read the predicted state change, "
+                        "and submit the real tx only when the simulated output matches your expectation.",
+                        size="4",
+                        color=TEXT_MUTED,
+                        line_height="1.7",
+                        width="100%",
+                    ),
+                    spacing="2",
+                    align_items="start",
+                    width="100%",
+                ),
+                rx.grid(
+                    icon_watermark_hover_card(
+                        rx.hstack(
+                            hover_icon_chip("code", size=24),
+                            rx.text("Flow", size="3", weight="bold", color=TEXT_PRIMARY),
+                            spacing="3",
+                            align_items="center",
+                        ),
+                        rx.vstack(
+                            _ordered_step_item(1, "Simulate the exact tx payload."),
+                            _ordered_step_item(2, "Read the predicted token-out delta from simulated state."),
+                            _ordered_step_item(3, "Abort when simulated output is below expectation."),
+                            _ordered_step_item(4, "Set `stamps` from simulation `stamps_used`."),
+                            _ordered_step_item(5, "Submit the real `send_tx` call with that stamp budget."),
+                            spacing="2",
+                            align_items="start",
+                        ),
+                        icon="code",
+                        padding="1.75rem",
+                    ),
+                    icon_watermark_hover_card(
+                        rx.hstack(
+                            hover_icon_chip("shield", size=24),
+                            rx.text("Guardrails", size="3", weight="bold", color=TEXT_PRIMARY),
+                            spacing="3",
+                            align_items="center",
+                        ),
+                        rx.vstack(
+                            _bullet_item("Treat non-zero simulation status as a hard stop."),
+                            _bullet_item("Fail when expected state keys are missing in simulation output."),
+                            _bullet_item("Enforce minimum output thresholds before broadcasting."),
+                            _bullet_item("Use simulated stamps to avoid underfunded tx attempts."),
+                            _bullet_item("Handle unsuccessful submit responses as terminal failures."),
+                            spacing="2",
+                            align_items="start",
+                        ),
+                        icon="shield",
+                        padding="1.75rem",
+                    ),
+                    columns={"base": "1", "lg": "2"},
+                    spacing="4",
+                    width="100%",
+                    align="stretch",
+                ),
+                subsection(
+                    "Code",
+                    _code_example(SCENARIO_CONTRACT_GUARDRAILS, copy_id="scenario-contract-guardrails"),
+                    id="scenario-contract-call-guardrails-code",
+                ),
+                rx.box(
+                    rx.text(
+                        "Important: this simulation preview is not a guarantee of final execution state. "
+                        "If another transaction front-runs and changes state before your tx executes, your real result can differ.",
+                        size="3",
+                        color=TEXT_MUTED,
+                        line_height="1.6",
+                    ),
+                    rx.text(
+                        "If you need strict guarantees, run the action from your own contract and assert the final conditions there. "
+                        "When the result is outside your bounds, raise an error so the transaction reverts.",
+                        size="3",
+                        color=TEXT_MUTED,
+                        line_height="1.6",
+                    ),
+                    padding="1rem 1.25rem",
+                    background=ACCENT_SOFT,
+                    border=f"1px solid {ACCENT_GLOW}",
+                    border_radius="10px",
+                    width="100%",
+                ),
+            )
+        ),
+        section(
+            section_panel(
+                rx.vstack(
+                    linked_heading(
+                        "Scenario 2: Reliable Transfer Confirmation",
                         anchor_id="scenario-transfer-confirmation",
                         size="6",
                         color=TEXT_PRIMARY,
@@ -685,100 +779,6 @@ def samples_page() -> rx.Component:
                     rx.text(
                         "Advanced WS note: this event-driven variant is better for long-running bots and high-throughput workers. "
                         "For production, add reconnect backoff and pending-tx resubscription, similar to xian-tg-bot.",
-                        size="3",
-                        color=TEXT_MUTED,
-                        line_height="1.6",
-                    ),
-                    padding="1rem 1.25rem",
-                    background=ACCENT_SOFT,
-                    border=f"1px solid {ACCENT_GLOW}",
-                    border_radius="10px",
-                    width="100%",
-                ),
-            )
-        ),
-        section(
-            section_panel(
-                rx.vstack(
-                    linked_heading(
-                        "Scenario 2: Simulate, Stamp, Submit",
-                        anchor_id="scenario-contract-call-guardrails",
-                        size="6",
-                        color=TEXT_PRIMARY,
-                        weight="bold",
-                    ),
-                    rx.text(
-                        "For state-changing calls like a DEX buy, simulate first, read the predicted state change, "
-                        "and submit the real tx only when the simulated output matches your expectation.",
-                        size="4",
-                        color=TEXT_MUTED,
-                        line_height="1.7",
-                        width="100%",
-                    ),
-                    spacing="2",
-                    align_items="start",
-                    width="100%",
-                ),
-                rx.grid(
-                    icon_watermark_hover_card(
-                        rx.hstack(
-                            hover_icon_chip("code", size=24),
-                            rx.text("Flow", size="3", weight="bold", color=TEXT_PRIMARY),
-                            spacing="3",
-                            align_items="center",
-                        ),
-                        rx.vstack(
-                            _ordered_step_item(1, "Simulate the exact tx payload."),
-                            _ordered_step_item(2, "Read the predicted token-out delta from simulated state."),
-                            _ordered_step_item(3, "Abort when simulated output is below expectation."),
-                            _ordered_step_item(4, "Set `stamps` from simulation `stamps_used`."),
-                            _ordered_step_item(5, "Submit the real `send_tx` call with that stamp budget."),
-                            spacing="2",
-                            align_items="start",
-                        ),
-                        icon="code",
-                        padding="1.75rem",
-                    ),
-                    icon_watermark_hover_card(
-                        rx.hstack(
-                            hover_icon_chip("shield", size=24),
-                            rx.text("Guardrails", size="3", weight="bold", color=TEXT_PRIMARY),
-                            spacing="3",
-                            align_items="center",
-                        ),
-                        rx.vstack(
-                            _bullet_item("Treat non-zero simulation status as a hard stop."),
-                            _bullet_item("Fail when expected state keys are missing in simulation output."),
-                            _bullet_item("Enforce minimum output thresholds before broadcasting."),
-                            _bullet_item("Use simulated stamps to avoid underfunded tx attempts."),
-                            _bullet_item("Handle unsuccessful submit responses as terminal failures."),
-                            spacing="2",
-                            align_items="start",
-                        ),
-                        icon="shield",
-                        padding="1.75rem",
-                    ),
-                    columns={"base": "1", "lg": "2"},
-                    spacing="4",
-                    width="100%",
-                    align="stretch",
-                ),
-                subsection(
-                    "Code",
-                    _code_example(SCENARIO_CONTRACT_GUARDRAILS, copy_id="scenario-contract-guardrails"),
-                    id="scenario-contract-call-guardrails-code",
-                ),
-                rx.box(
-                    rx.text(
-                        "Important: this simulation preview is not a guarantee of final execution state. "
-                        "If another transaction front-runs and changes state before your tx executes, your real result can differ.",
-                        size="3",
-                        color=TEXT_MUTED,
-                        line_height="1.6",
-                    ),
-                    rx.text(
-                        "If you need strict guarantees, run the action from your own contract and assert the final conditions there. "
-                        "When the result is outside your bounds, raise an error so the transaction reverts.",
                         size="3",
                         color=TEXT_MUTED,
                         line_height="1.6",
