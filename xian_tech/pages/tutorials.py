@@ -70,41 +70,29 @@ SEARCH_SECTIONS = [
 
 # Scenario 1: store data on chain.
 STORE_DATA_STEP_1 = '''# Persistent contract state.
-owner = Variable()
 records = Hash(default_value='')'''
 
-STORE_DATA_STEP_2 = '''# Runs once on deployment.
-@construct
-def seed():
-    owner.set(ctx.caller)'''
-
-STORE_DATA_STEP_3 = '''# Saves or overwrites a value by key.
+STORE_DATA_STEP_2 = '''# Saves or overwrites a value by key.
 @export
 def save(key: str, value: str):
     assert len(key) > 0, 'key required'
     records[key] = value'''
 
-STORE_DATA_STEP_4 = '''# Reads the current value for a key.
+STORE_DATA_STEP_3 = '''# Reads the current value for a key.
 @export
 def read(key: str):
     return records[key]'''
 
 STORE_DATA_FULL = '''# Stage 1: Declare persistent state.
-owner = Variable()
 records = Hash(default_value='')
 
-# Stage 2: Initialize once on deployment.
-@construct
-def seed():
-    owner.set(ctx.caller)
-
-# Stage 3: Write path.
+# Stage 2: Write path.
 @export
 def save(key: str, value: str):
     assert len(key) > 0, 'key required'
     records[key] = value
 
-# Stage 4: Read path.
+# Stage 3: Read path.
 @export
 def read(key: str):
     return records[key]'''
@@ -761,7 +749,7 @@ def tutorials_page() -> rx.Component:
                         weight="bold",
                     ),
                     rx.text(
-                        "This is the smallest complete storage contract pattern: one initializer, one write method, and one read method.",
+                        "This is the smallest complete storage contract pattern: one write method and one read method.",
                         size="4",
                         color=TEXT_MUTED,
                         line_height="1.7",
@@ -776,29 +764,22 @@ def tutorials_page() -> rx.Component:
                         1,
                         "Declare persistent state",
                         why="Contract state must be declared up front so values persist between transactions.",
-                        how="Use a `Variable` for single values and a `Hash` for key-value records.",
+                        how="Use a `Hash` for key-value records.",
                         snippet=STORE_DATA_STEP_1,
                     ),
                     _tutorial_step(
                         2,
-                        "Initialize with @construct",
-                        why="Initialization runs once at submission time and sets the starting ownership/context values.",
-                        how="Set owner (or config) in `seed` so later writes can be constrained if needed.",
+                        "Implement the write path",
+                        why="All on-chain mutations should validate input before writing, because writes consume stamps.",
+                        how="Create a `save(key, value)` export and store into `records[key]`.",
                         snippet=STORE_DATA_STEP_2,
                     ),
                     _tutorial_step(
                         3,
-                        "Implement the write path",
-                        why="All on-chain mutations should validate input before writing, because writes consume stamps.",
-                        how="Create a `save(key, value)` export and store into `records[key]`.",
-                        snippet=STORE_DATA_STEP_3,
-                    ),
-                    _tutorial_step(
-                        4,
                         "Implement the read path",
                         why="Read functions provide deterministic state access and are the public API for consumers.",
                         how="Create `read(key)` that returns `records[key]`.",
-                        snippet=STORE_DATA_STEP_4,
+                        snippet=STORE_DATA_STEP_3,
                     ),
                     spacing="4",
                     align_items="start",
