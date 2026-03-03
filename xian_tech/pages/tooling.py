@@ -384,8 +384,16 @@ def tooling_page() -> rx.Component:
                         ),
                         section_action_links(
                             [
-                                {"label": "Repo", "icon": "github", "href": "https://github.com/xian-technology/xian-py"},
-                                {"label": "DeepWiki", "icon": "brain", "href": "https://deepwiki.com/xian-technology/xian-py"},
+                                {
+                                    "label": "Repo",
+                                    "icon": "github",
+                                    "href": "https://github.com/xian-technology/xian-abci/tree/alter_table/src/xian/services/bds",
+                                },
+                                {
+                                    "label": "DeepWiki",
+                                    "icon": "brain",
+                                    "href": "https://deepwiki.com/xian-technology/xian-abci/5.3-block-data-service-(bds)",
+                                },
                                 {"label": "Docs", "icon": "book_open", "href": "https://docs.xian.technology"},
                             ]
                         ),
