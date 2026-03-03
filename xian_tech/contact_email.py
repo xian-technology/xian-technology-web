@@ -1,5 +1,6 @@
 from __future__ import annotations
 from email.message import EmailMessage
+from email.utils import make_msgid
 
 import os
 import smtplib
@@ -38,6 +39,7 @@ def send_contact_email(
         raise ValueError("SMTP_PASSWORD is required when SMTP_USERNAME is set.")
 
     message = EmailMessage()
+    message["Message-ID"] = make_msgid(domain=host)
     message["Subject"] = _sanitize_header(subject)
     message["From"] = _sanitize_header(sender)
     message["To"] = _sanitize_header(recipient)
