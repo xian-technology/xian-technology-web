@@ -27,7 +27,7 @@ app = rx.App(
     ],
 )
 
-app.add_page(home_page, route="/", title="Xian Technology Foundation")
+app.add_page(home_page, route="/", title="Xian Technology")
 app.add_page(consensus_page, route="/consensus", title="CometBFT Consensus")
 app.add_page(contracting_page, route="/contracting", title="Contracting")
 app.add_page(abci_page, route="/abci", title="ABCI for CometBFT")

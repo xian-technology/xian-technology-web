@@ -66,7 +66,7 @@ def hero_section() -> rx.Component:
         rx.vstack(
             rx.box(
                 rx.text(
-                    "XIAN_TECHNOLOGY_FOUNDATION",
+                    "XIAN_TECHNOLOGY",
                     size="2",
                     letter_spacing="0.15em",
                     color=ACCENT,
