@@ -329,16 +329,16 @@ def tooling_page() -> rx.Component:
                 ),
                 rx.grid(
                     _tooling_jump_card(
-                        title="Python SDK",
-                        description="Build wallet, transaction, and contract workflows with xian-py.",
-                        target="python-sdk",
-                        icon="code",
-                    ),
-                    _tooling_jump_card(
                         title="BDS",
                         description="Query chain history and contract state over GraphQL.",
                         target="blockchain-data-service-bds",
                         icon="database",
+                    ),
+                    _tooling_jump_card(
+                        title="Python SDK",
+                        description="Build wallet, transaction, and contract workflows with xian-py.",
+                        target="python-sdk",
+                        icon="code",
                     ),
                     _tooling_jump_card(
                         title="Xian Linter",
