@@ -109,7 +109,7 @@ SEARCH_SECTIONS = [
         "subtitle": "xian-py for wallets, transactions, and contract workflows.",
         "category": "Technology",
         "badge": "Section",
-        "href": "/tooling",
+        "href": "/tooling#python-sdk",
         "keywords": ["xian-py", "SDK", "Wallets", "Transactions"],
     },
     {
@@ -117,7 +117,7 @@ SEARCH_SECTIONS = [
         "subtitle": "Contract linting in inline mode or as a standalone API service.",
         "category": "Technology",
         "badge": "Section",
-        "href": "/tooling",
+        "href": "/tooling#xian-linter",
         "keywords": [
             "xian-linter",
             "Linting",
@@ -133,7 +133,7 @@ SEARCH_SECTIONS = [
         "subtitle": "PostgreSQL + GraphQL access to transaction and state history.",
         "category": "Technology",
         "badge": "Section",
-        "href": "/tooling",
+        "href": "/tooling#blockchain-data-service-bds",
         "keywords": ["BDS", "GraphQL", "PostgreSQL", "PostGraphile"],
     },
     {
@@ -141,7 +141,7 @@ SEARCH_SECTIONS = [
         "subtitle": "Local MCP server for AI assistants to interact with Xian wallets, contracts, and the DEX.",
         "category": "Technology",
         "badge": "Section",
-        "href": "/tooling",
+        "href": "/tooling#mcp-server",
         "keywords": ["MCP", "AI assistants", "Wallets", "DEX"],
     },
     {
@@ -149,7 +149,7 @@ SEARCH_SECTIONS = [
         "subtitle": "Agent-ready skills for Xian SDK usage and node operations.",
         "category": "Technology",
         "badge": "Section",
-        "href": "/tooling",
+        "href": "/tooling#agent-skills",
         "keywords": ["AI skills", "Agents", "xian-py", "Nodes"],
     },
     {
@@ -157,7 +157,7 @@ SEARCH_SECTIONS = [
         "subtitle": "AI-ready guides for building and reviewing Xian contracts.",
         "category": "Technology",
         "badge": "Section",
-        "href": "/tooling",
+        "href": "/tooling#ai-guides",
         "keywords": ["AI guides", "Contracting guide", "Smart contracts"],
     },
 ]
@@ -255,6 +255,33 @@ def _feature_item_with_code(text: str) -> rx.Component:
     )
 
 
+def _tooling_jump_card(
+    *,
+    title: str,
+    description: str,
+    target: str,
+    icon: str,
+) -> rx.Component:
+    return rx.link(
+        icon_watermark_hover_card(
+            rx.hstack(
+                hover_icon_chip(icon, size=24),
+                rx.heading(title, size="5", weight="bold", color=TEXT_PRIMARY),
+                spacing="3",
+                align_items="center",
+            ),
+            rx.text(description, size="3", color=TEXT_MUTED, line_height="1.7"),
+            icon=icon,
+            padding="1.75rem",
+            height="100%",
+        ),
+        href=f"#{target}",
+        width="100%",
+        display="block",
+        _hover={"textDecoration": "none"},
+    )
+
+
 def tooling_page() -> rx.Component:
     """Tooling and interfaces overview."""
     return page_layout(
@@ -288,9 +315,69 @@ def tooling_page() -> rx.Component:
         section(
             section_panel(
                 rx.vstack(
+                    linked_heading("Tool Navigator", size="6", color=TEXT_PRIMARY, weight="bold"),
+                    rx.text(
+                        "Pick a tooling area and jump to the relevant section below.",
+                        size="3",
+                        color=TEXT_MUTED,
+                        line_height="1.7",
+                        width="100%",
+                    ),
+                    spacing="2",
+                    align_items="start",
+                    width="100%",
+                ),
+                rx.grid(
+                    _tooling_jump_card(
+                        title="Python SDK",
+                        description="Build wallet, transaction, and contract workflows with xian-py.",
+                        target="python-sdk",
+                        icon="code",
+                    ),
+                    _tooling_jump_card(
+                        title="BDS",
+                        description="Query chain history and contract state over GraphQL.",
+                        target="blockchain-data-service-bds",
+                        icon="database",
+                    ),
+                    _tooling_jump_card(
+                        title="Xian Linter",
+                        description="Catch contract and Python issues before deployment.",
+                        target="xian-linter",
+                        icon="shield",
+                    ),
+                    _tooling_jump_card(
+                        title="MCP Server",
+                        description="Expose wallet, contract, and DEX tools to AI assistants.",
+                        target="mcp-server",
+                        icon="server",
+                    ),
+                    _tooling_jump_card(
+                        title="AI Guides",
+                        description="Use machine-readable guidance for safer contract generation and review.",
+                        target="ai-guides",
+                        icon="book_open",
+                    ),
+                    _tooling_jump_card(
+                        title="Agent Skills",
+                        description="Plug skill packs into assistants for SDK and node operations.",
+                        target="agent-skills",
+                        icon="brain",
+                    ),
+                    columns={"base": "1", "md": "2", "lg": "3"},
+                    spacing="4",
+                    width="100%",
+                    align="stretch",
+                ),
+            )
+        ),
+        section(
+            section_panel(
+                rx.vstack(
                     rx.flex(
                         linked_heading(
                             "Blockchain Data Service (BDS)",
+                            anchor_id="blockchain-data-service-bds",
                             size="6",
                             color=TEXT_PRIMARY,
                             weight="bold",
@@ -535,7 +622,7 @@ def tooling_page() -> rx.Component:
             section_panel(
                 rx.vstack(
                     rx.flex(
-                        linked_heading("Python SDK", size="6", color=TEXT_PRIMARY, weight="bold"),
+                        linked_heading("Python SDK", anchor_id="python-sdk", size="6", color=TEXT_PRIMARY, weight="bold"),
                         section_action_links(
                             [
                                 {"label": "Repo", "icon": "github", "href": "https://github.com/xian-technology/xian-py"},
@@ -697,7 +784,7 @@ def tooling_page() -> rx.Component:
             section_panel(
                 rx.vstack(
                     rx.flex(
-                        linked_heading("Xian Linter", size="6", color=TEXT_PRIMARY, weight="bold"),
+                        linked_heading("Xian Linter", anchor_id="xian-linter", size="6", color=TEXT_PRIMARY, weight="bold"),
                         section_action_links(
                             [
                                 {"label": "Repo", "icon": "github", "href": "https://github.com/xian-technology/xian-linter"},
@@ -782,7 +869,7 @@ def tooling_page() -> rx.Component:
             section_panel(
                 rx.vstack(
                     rx.flex(
-                        linked_heading("MCP Server", size="6", color=TEXT_PRIMARY, weight="bold"),
+                        linked_heading("MCP Server", anchor_id="mcp-server", size="6", color=TEXT_PRIMARY, weight="bold"),
                         section_action_links(
                             [
                                 {"label": "Repo", "icon": "github", "href": "https://github.com/xian-technology/xian-mcp-server"},
@@ -895,7 +982,7 @@ def tooling_page() -> rx.Component:
             section_panel(
                 rx.vstack(
                     rx.flex(
-                        linked_heading("AI Guides", size="6", color=TEXT_PRIMARY, weight="bold"),
+                        linked_heading("AI Guides", anchor_id="ai-guides", size="6", color=TEXT_PRIMARY, weight="bold"),
                         section_action_links(
                             [{"label": "Repo", "icon": "github", "href": "https://github.com/xian-technology/xian-ai-guides"}],
                         ),
@@ -955,7 +1042,7 @@ def tooling_page() -> rx.Component:
             section_panel(
                 rx.vstack(
                     rx.flex(
-                        linked_heading("Agent Skills", size="6", color=TEXT_PRIMARY, weight="bold"),
+                        linked_heading("Agent Skills", anchor_id="agent-skills", size="6", color=TEXT_PRIMARY, weight="bold"),
                         section_action_links(
                             [{"label": "Repo", "icon": "github", "href": "https://github.com/xian-technology/xian-ai-skills"}],
                         ),
