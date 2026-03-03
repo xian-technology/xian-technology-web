@@ -474,27 +474,12 @@ xian.send_tx('con_counter_router', 'increment', {'step': 1})
 xian.send_tx('con_counter_router', 'current', {})'''
 
 
-def _bullet_item(text: str) -> rx.Component:
-    return rx.hstack(
-        rx.icon(tag="check", size=16, color=ACCENT),
-        text_with_inline_code(
-            text,
-            size="3",
-            color=TEXT_MUTED,
-            line_height="1.6",
-        ),
-        spacing="2",
-        align_items="center",
-    )
-
-
 def _scenario_jump_card(
     *,
     title: str,
     description: str,
     target: str,
     icon: str,
-    bullets: list[str],
 ) -> rx.Component:
     return rx.link(
         icon_watermark_hover_card(
@@ -509,12 +494,6 @@ def _scenario_jump_card(
                 size="3",
                 color=TEXT_MUTED,
                 line_height="1.7",
-                width="100%",
-            ),
-            rx.vstack(
-                *[_bullet_item(item) for item in bullets],
-                spacing="2",
-                align_items="start",
                 width="100%",
             ),
             icon=icon,
@@ -700,44 +679,24 @@ def tutorials_page() -> rx.Component:
                         description="Start with the smallest useful contract: seed state, save a value, read it back.",
                         target="scenario-store-data",
                         icon="database",
-                        bullets=[
-                            "Initialize persistent storage",
-                            "Write with one `save` function",
-                            "Read back with one `read` function",
-                        ],
                     ),
                     _scenario_jump_card(
                         title="Token From Scratch",
                         description="Build an XSC0001-style token and see how each required function maps to behavior.",
                         target="scenario-token-from-scratch",
                         icon="list_checks",
-                        bullets=[
-                            "State + metadata shape",
-                            "Transfer + delegated transfer flow",
-                            "Operator-controlled metadata updates",
-                        ],
                     ),
                     _scenario_jump_card(
                         title="Multisig Treasury",
                         description="Require multiple owner approvals before contract funds are moved.",
                         target="scenario-multisig",
                         icon="shield",
-                        bullets=[
-                            "Owners and threshold setup",
-                            "Proposal + approval lifecycle",
-                            "Automatic execution on threshold",
-                        ],
                     ),
                     _scenario_jump_card(
                         title="Upgradable Router",
                         description="Route calls to an implementation contract and switch targets without changing entrypoint.",
                         target="scenario-upgradable-contracts",
                         icon="layers",
-                        bullets=[
-                            "Contract-to-contract forwarding",
-                            "Admin-controlled target switching",
-                            "Simple upgrade call flow",
-                        ],
                     ),
                     columns={"base": "1", "md": "2"},
                     spacing="4",

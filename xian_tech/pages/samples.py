@@ -457,7 +457,6 @@ def _scenario_jump_card(
     description: str,
     target: str,
     icon: str,
-    bullets: list[str],
 ) -> rx.Component:
     return rx.link(
         icon_watermark_hover_card(
@@ -468,12 +467,6 @@ def _scenario_jump_card(
                 align_items="center",
             ),
             rx.text(description, size="3", color=TEXT_MUTED, line_height="1.7"),
-            rx.vstack(
-                *[_bullet_item(item) for item in bullets],
-                spacing="2",
-                align_items="start",
-                width="100%",
-            ),
             icon=icon,
             padding="1.75rem",
             height="100%",
@@ -549,33 +542,18 @@ def samples_page() -> rx.Component:
                         description="Preview simulated state deltas and only submit when expected output passes checks.",
                         target="scenario-contract-call-guardrails",
                         icon="code",
-                        bullets=[
-                            "Inspect simulation state diff",
-                            "Validate expected output first",
-                            "Reuse simulated stamp budget",
-                        ],
                     ),
                     _scenario_jump_card(
                         title="Reliable Transfer Confirmation",
                         description="Send token transfers with bounded polling and explicit success checks.",
                         target="scenario-transfer-confirmation",
                         icon="send",
-                        bullets=[
-                            "Submit through xian-py",
-                            "Wait for tx with timeout",
-                            "Handle pending and failure paths",
-                        ],
                     ),
                     _scenario_jump_card(
                         title="BDS Retrieval and Pagination",
                         description="Use GraphQL to query events and state snapshots with production-safe pagination.",
                         target="scenario-bds-retrieval",
                         icon="database",
-                        bullets=[
-                            "Fetch transfer history",
-                            "Page with endCursor",
-                            "Combine state + event reads",
-                        ],
                     ),
                     columns={"base": "1", "md": "2", "lg": "3"},
                     spacing="4",
