@@ -358,11 +358,11 @@ class State(rx.State):
                 elif column.get("id") is not None:
                     column_id = normalize_id(column.get("id"))
 
+                if is_excluded(card):
+                    continue
                 card_payload = build_raw_card_payload(card)
                 if card_payload.get("closed"):
                     add_done_payload(card_payload)
-                    continue
-                if is_excluded(card):
                     continue
                 if column_id and column_id in cards_by_column:
                     cards_by_column[column_id].append(card_payload)
@@ -373,6 +373,8 @@ class State(rx.State):
                 items.sort(key=lambda item: item["number"])
 
             for card in closed_cards:
+                if is_excluded(card):
+                    continue
                 add_done_payload(build_raw_card_payload(card, force_closed=True))
 
             done_payload = sorted(done_cards, key=lambda item: item["number"])
