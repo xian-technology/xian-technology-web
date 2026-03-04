@@ -241,17 +241,19 @@ class State(rx.State):
             def normalize_id(value: Any) -> str:
                 return str(value).strip()
 
-            def is_done_column(name: str) -> bool:
-                normalized = name.strip().lower()
-                done_keywords = (
-                    "done",
-                    "complete",
-                    "completed",
-                    "finished",
-                    "shipped",
-                    "released",
-                )
-                return any(keyword in normalized for keyword in done_keywords)
+            def parse_bool(value: Any) -> bool:
+                if isinstance(value, bool):
+                    return value
+                if value is None:
+                    return False
+                if isinstance(value, (int, float)):
+                    return value != 0
+                text = str(value).strip().lower()
+                if text in {"true", "1", "yes", "y", "on"}:
+                    return True
+                if text in {"false", "0", "no", "n", "off", ""}:
+                    return False
+                return bool(value)
 
             columns = get_board_columns(
                 base_url=base_url,
@@ -293,15 +295,9 @@ class State(rx.State):
                 columns,
                 key=lambda col: (col.get("position") is None, col.get("position") or 0),
             )
-            done_column_ids = {
-                normalize_id(col.get("id", ""))
-                for col in columns_sorted
-                if is_done_column(col.get("name", ""))
-            }
             cards_by_column: dict[str, list[dict[str, Any]]] = {
                 normalize_id(col.get("id", "")): []
                 for col in columns_sorted
-                if normalize_id(col.get("id", "")) not in done_column_ids
             }
             untriaged: list[dict[str, Any]] = []
             done_cards: list[dict[str, Any]] = []
@@ -333,22 +329,18 @@ class State(rx.State):
                 tags = [tag.lower() for tag in extract_tags(card.get("tags"))]
                 return any(tag in excluded_tags for tag in tags)
 
-            if excluded_tags:
-                open_cards = [card for card in open_cards if not is_excluded(card)]
-                closed_cards = [card for card in closed_cards if not is_excluded(card)]
-
-            def build_raw_card_payload(data: dict[str, Any]) -> dict[str, Any]:
+            def build_raw_card_payload(data: dict[str, Any], *, force_closed: bool = False) -> dict[str, Any]:
                 tags = extract_tags(data.get("tags"))
                 return {
                     "id": data.get("id", ""),
                     "number": data.get("number", 0),
                     "title": data.get("title", ""),
-                    "status": data.get("status", ""),
+                    "status": str(data.get("status", "")),
                     "url": data.get("url", ""),
                     "tags": tags,
                     "tags_text": ", ".join(tags),
                     "golden": bool(data.get("golden", False)),
-                    "closed": bool(data.get("closed", False)),
+                    "closed": force_closed or parse_bool(data.get("closed", False)),
                 }
 
             def add_done_payload(payload: dict[str, Any]) -> None:
@@ -367,8 +359,10 @@ class State(rx.State):
                     column_id = normalize_id(column.get("id"))
 
                 card_payload = build_raw_card_payload(card)
-                if column_id in done_column_ids or card_payload.get("closed"):
+                if card_payload.get("closed"):
                     add_done_payload(card_payload)
+                    continue
+                if is_excluded(card):
                     continue
                 if column_id and column_id in cards_by_column:
                     cards_by_column[column_id].append(card_payload)
@@ -379,15 +373,13 @@ class State(rx.State):
                 items.sort(key=lambda item: item["number"])
 
             for card in closed_cards:
-                add_done_payload(build_raw_card_payload(card))
+                add_done_payload(build_raw_card_payload(card, force_closed=True))
 
             done_payload = sorted(done_cards, key=lambda item: item["number"])
 
             columns_payload = []
             for col in columns_sorted:
                 col_id = normalize_id(col.get("id", ""))
-                if col_id in done_column_ids:
-                    continue
                 normalized = str(col.get("name", "")).strip().lower()
                 columns_payload.append(
                     {
