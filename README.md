@@ -12,14 +12,22 @@ for the Xian stack, and the Fizzy-backed roadmap view.
 
 ## Configuration
 
-Runtime settings live in `rxconfig.py`. The default config enables the sitemap
-and Tailwind v4 plugins:
+Runtime settings live in `rxconfig.py`:
 
 ```python
+import os
 import reflex as rx
+
+# Disable SSR/prerendered HTML to avoid hydration mismatches behind the proxy.
+os.environ.setdefault("REFLEX_SSR", "0")
 
 config = rx.Config(
     app_name="xian_tech",
+    deploy_url="https://xian.technology",
+    api_url="https://xian.technology",
+    frontend_port=3000,
+    backend_port=8000,
+    show_built_with_reflex=False,
     plugins=[
         rx.plugins.SitemapPlugin(),
         rx.plugins.TailwindV4Plugin(),
@@ -27,8 +35,11 @@ config = rx.Config(
 )
 ```
 
-Ports and other runtime flags can be overridden via CLI arguments (see Running the app),
-so the same config works in both development and production.
+- `REFLEX_SSR=0` disables server-side rendering to prevent hydration mismatches
+  behind the reverse proxy. OG/Twitter meta tags are injected via Nginx instead
+  (see [Social preview](#social-preview-og--twitter-meta-tags)).
+- `deploy_url` / `api_url` should match the public-facing domain.
+- Ports can be overridden via CLI arguments (see Running the app).
 
 ### Environment variables
 
@@ -128,6 +139,21 @@ your static hosting of choice.
 - For split-port deployments, send `/` to port 3000 and proxy only backend endpoints to port 8000 with `proxy_http_version 1.1`, `Upgrade`, and `Connection "upgrade"`.
 - If you enforce a CSP, be ready to include `unsafe-eval` in `script-src` if Reflex hydration fails (some components rely on `new Function`).
 
+### Social preview (OG / Twitter meta tags)
+
+Because the app runs in SPA mode (`REFLEX_SSR=0`), the initial HTML shell
+contains no `<meta>` tags beyond charset and viewport. Crawlers (Telegram,
+Twitter, Facebook, etc.) don't execute JavaScript, so they never see the tags
+Reflex injects client-side.
+
+The fix is to use Nginx's `sub_filter` module (`--with-http_sub_module`, included
+in the default Ubuntu/Debian package) to inject the OG and Twitter meta tags
+into `</head>` before the response reaches the client. See the config examples
+below — the `sub_filter` block handles this transparently.
+
+If you change the preview copy or image, update both `xian_tech/data.py` **and**
+the corresponding `sub_filter` block in the Nginx config.
+
 ### Example Nginx config (single-port mode)
 
 ```nginx
@@ -143,6 +169,31 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Inject OG / Twitter meta tags into the SPA shell so crawlers
+        # (Telegram, Twitter, Facebook, etc.) can build link previews
+        # without executing JavaScript.
+        sub_filter '</head>' '
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Xian Technology"/>
+<meta property="og:url" content="https://xian.technology"/>
+<meta property="og:title" content="Python-Native Contracting on a CometBFT Backbone"/>
+<meta property="og:description" content="Xian is a CometBFT-backed blockchain with a pure Python contracting engine. Write native Python contracts without transpilers."/>
+<meta property="og:image" content="https://xian.technology/social-preview.png"/>
+<meta property="og:image:secure_url" content="https://xian.technology/social-preview.png"/>
+<meta property="og:image:type" content="image/png"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="Python-Native Contracting on a CometBFT Backbone"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Python-Native Contracting on a CometBFT Backbone"/>
+<meta name="twitter:description" content="Xian is a CometBFT-backed blockchain with a pure Python contracting engine. Write native Python contracts without transpilers."/>
+<meta name="twitter:image" content="https://xian.technology/social-preview.png"/>
+<meta name="twitter:image:alt" content="Python-Native Contracting on a CometBFT Backbone"/>
+<meta name="twitter:site" content="@xian_technology"/>
+<meta name="description" content="Xian is a CometBFT-backed blockchain with a pure Python contracting engine. Write native Python contracts without transpilers."/>
+</head>';
+        sub_filter_once on;
     }
 
     listen 443 ssl;
