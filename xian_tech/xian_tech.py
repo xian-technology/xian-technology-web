@@ -1,5 +1,6 @@
 import reflex as rx
 
+from .data import HOME_SOCIAL_META, SOCIAL_PREVIEW_DESCRIPTION, SOCIAL_PREVIEW_IMAGE_URL
 from .pages.abci import abci_page
 from .pages.consensus import consensus_page
 from .pages.contracting import contracting_page
@@ -27,7 +28,14 @@ app = rx.App(
     ],
 )
 
-app.add_page(home_page, route="/", title="Xian Technology")
+app.add_page(
+    home_page,
+    route="/",
+    title="Xian Technology",
+    description=SOCIAL_PREVIEW_DESCRIPTION,
+    image=SOCIAL_PREVIEW_IMAGE_URL,
+    meta=HOME_SOCIAL_META,
+)
 app.add_page(consensus_page, route="/consensus", title="CometBFT Consensus")
 app.add_page(contracting_page, route="/contracting", title="Contracting")
 app.add_page(abci_page, route="/abci", title="ABCI for CometBFT")

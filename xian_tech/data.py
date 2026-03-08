@@ -8,6 +8,34 @@ def _slugify(value: str) -> str:
     )
 
 
+SITE_URL = "https://xian.technology"
+SOCIAL_PREVIEW_TITLE = "Python-Native Contracting on a CometBFT Backbone"
+SOCIAL_PREVIEW_DESCRIPTION = (
+    "Xian is a CometBFT-backed blockchain with a pure Python contracting engine. "
+    "Write native Python contracts without transpilers."
+)
+SOCIAL_PREVIEW_IMAGE_PATH = "/social-preview.png"
+SOCIAL_PREVIEW_IMAGE_URL = f"{SITE_URL}{SOCIAL_PREVIEW_IMAGE_PATH}"
+HOME_SOCIAL_META = [
+    {"property": "og:type", "content": "website"},
+    {"property": "og:site_name", "content": "Xian Technology"},
+    {"property": "og:url", "content": SITE_URL},
+    {"property": "og:title", "content": SOCIAL_PREVIEW_TITLE},
+    {"property": "og:description", "content": SOCIAL_PREVIEW_DESCRIPTION},
+    {"property": "og:image:secure_url", "content": SOCIAL_PREVIEW_IMAGE_URL},
+    {"property": "og:image:type", "content": "image/png"},
+    {"property": "og:image:width", "content": "1200"},
+    {"property": "og:image:height", "content": "630"},
+    {"property": "og:image:alt", "content": SOCIAL_PREVIEW_TITLE},
+    {"name": "twitter:card", "content": "summary_large_image"},
+    {"name": "twitter:title", "content": SOCIAL_PREVIEW_TITLE},
+    {"name": "twitter:description", "content": SOCIAL_PREVIEW_DESCRIPTION},
+    {"name": "twitter:image", "content": SOCIAL_PREVIEW_IMAGE_URL},
+    {"name": "twitter:image:alt", "content": SOCIAL_PREVIEW_TITLE},
+    {"name": "twitter:site", "content": "@xian_technology"},
+]
+
+
 NAV_LINKS = [
     {"label": "Home", "href": "/"},
     {
@@ -239,11 +267,17 @@ COMMUNITY_STREAMS = [
 ]
 
 __all__ = [
+    "HOME_SOCIAL_META",
     "CORE_COMPONENTS",
     "BDS_COMPONENTS",
     "COMMUNITY_STREAMS",
     "ECOSYSTEM_INITIATIVES",
     "NAV_LINKS",
     "NOTEWORTHY_QUOTES",
+    "SITE_URL",
+    "SOCIAL_PREVIEW_DESCRIPTION",
+    "SOCIAL_PREVIEW_IMAGE_PATH",
+    "SOCIAL_PREVIEW_IMAGE_URL",
+    "SOCIAL_PREVIEW_TITLE",
     "TECHNOLOGY_TRACKS",
 ]
