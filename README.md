@@ -177,21 +177,21 @@ server {
 <meta property="og:type" content="website"/>
 <meta property="og:site_name" content="Xian Technology"/>
 <meta property="og:url" content="https://xian.technology"/>
-<meta property="og:title" content="Python-Native Contracting on a CometBFT Backbone"/>
-<meta property="og:description" content="Xian is a CometBFT-backed blockchain with a pure Python contracting engine. Write native Python contracts without transpilers."/>
+<meta property="og:title" content="Python-First Decentralized Infrastructure for Programmable Networks"/>
+<meta property="og:description" content="Xian is a Python-first decentralized application platform for building programmable networks, easy smart contracts, and software-friendly integration."/>
 <meta property="og:image" content="https://xian.technology/social-preview.png"/>
 <meta property="og:image:secure_url" content="https://xian.technology/social-preview.png"/>
 <meta property="og:image:type" content="image/png"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>
-<meta property="og:image:alt" content="Python-Native Contracting on a CometBFT Backbone"/>
+<meta property="og:image:alt" content="Python-First Decentralized Infrastructure for Programmable Networks"/>
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Python-Native Contracting on a CometBFT Backbone"/>
-<meta name="twitter:description" content="Xian is a CometBFT-backed blockchain with a pure Python contracting engine. Write native Python contracts without transpilers."/>
+<meta name="twitter:title" content="Python-First Decentralized Infrastructure for Programmable Networks"/>
+<meta name="twitter:description" content="Xian is a Python-first decentralized application platform for building programmable networks, easy smart contracts, and software-friendly integration."/>
 <meta name="twitter:image" content="https://xian.technology/social-preview.png"/>
-<meta name="twitter:image:alt" content="Python-Native Contracting on a CometBFT Backbone"/>
+<meta name="twitter:image:alt" content="Python-First Decentralized Infrastructure for Programmable Networks"/>
 <meta name="twitter:site" content="@xian_technology"/>
-<meta name="description" content="Xian is a CometBFT-backed blockchain with a pure Python contracting engine. Write native Python contracts without transpilers."/>
+<meta name="description" content="Xian is a Python-first decentralized application platform for building programmable networks, easy smart contracts, and software-friendly integration."/>
 </head>';
         sub_filter_once on;
     }

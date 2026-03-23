@@ -286,7 +286,7 @@ def api_page() -> rx.Component:
                 ),
                 rx.text(
                     "If you are building in Python, many of these routes are already wrapped by the ",
-                    rx.link("xian-py", href="https://github.com/xian-network/xian-py", is_external=True, color=ACCENT),
+                    rx.link("xian-py", href="https://github.com/xian-technology/xian-py", is_external=True, color=ACCENT),
                     " SDK. "
                     "In those cases, prefer SDK methods for safer defaults and cleaner integration flow instead of calling raw routes directly.",
                     size="3",

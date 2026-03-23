@@ -9,10 +9,13 @@ def _slugify(value: str) -> str:
 
 
 SITE_URL = "https://xian.technology"
-SOCIAL_PREVIEW_TITLE = "Python-Native Contracting on a CometBFT Backbone"
+SOCIAL_PREVIEW_TITLE = (
+    "Python-First Decentralized Infrastructure for Programmable Networks"
+)
 SOCIAL_PREVIEW_DESCRIPTION = (
-    "Xian is a CometBFT-backed blockchain with a pure Python contracting engine. "
-    "Write native Python contracts without transpilers."
+    "Xian is a Python-first decentralized application platform for building "
+    "programmable networks, easy smart contracts, and software-friendly "
+    "integration."
 )
 SOCIAL_PREVIEW_IMAGE_PATH = "/social-preview.png"
 SOCIAL_PREVIEW_IMAGE_URL = f"{SITE_URL}{SOCIAL_PREVIEW_IMAGE_PATH}"
@@ -76,25 +79,25 @@ NAV_LINKS = [
 CORE_COMPONENTS = [
     {
         "title": "CometBFT Consensus Engine",
-        "description": "Byzantine fault-tolerant, deterministic state machine replication securing every block.",
+        "description": "Battle-tested consensus infrastructure underpinning programmable Xian networks.",
         "href": "/consensus",
         "icon": "satellite",
     },
     {
         "title": "Python ABCI for CometBFT",
-        "description": "ABCI application in Python bridging consensus with the contracting runtime and state patches.",
+        "description": "The node application that connects consensus, deterministic execution, queries, and operational services.",
         "href": "/abci",
         "icon": "link",
     },
     {
-        "title": "Python Smart Contract Engine",
-        "description": "Pure Python contracts with deterministic execution—no transpilers or alternate languages.",
+        "title": "Python-Friendly Contract Engine",
+        "description": "Deterministic contract execution designed to keep smart contracts easy to write, test, and understand.",
         "href": "/contracting",
         "icon": "code",
     },
     {
         "title": "Tooling & Interfaces",
-        "description": "xian-py SDK plus BDS GraphQL for querying chain data and building integrations.",
+        "description": "SDKs, indexed reads, monitoring, and deployment tooling for integrating Xian into real software systems.",
         "href": "/tooling",
         "icon": "wrench",
     },
@@ -152,8 +155,8 @@ TECHNOLOGY_TRACKS = [
         "title": "Pure Python Contracts",
         "icon": "code",
         "description": (
-            "Advance libraries that let developers express complex financial and governance "
-            "logic in idiomatic Python, with deterministic execution and precise tooling."
+            "Advance libraries that let developers express useful decentralized application "
+            "logic in idiomatic Python with deterministic execution and strong tooling."
         ),
         "points": [
             "Comprehensive standard library with battle-tested primitives",
@@ -169,22 +172,22 @@ TECHNOLOGY_TRACKS = [
         ),
     },
     {
-        "title": "High-Assurance Node",
+        "title": "Operator-Ready Node",
         "icon": "zap",
         "description": (
-            "Refine the Xian node with next generation instrumentation, blazing sync times, "
-            "and transparent performance dashboards for operators."
+            "Refine the Xian node with deterministic execution, transparent monitoring, "
+            "and deployment surfaces that are straightforward to operate."
         ),
         "points": [
-            "Deterministic Python runtime tuned for blockchain workloads",
+            "Deterministic execution and clear operational boundaries",
             "Observability-first metrics, structured logs, and tracing adapters",
-            "Optimized networking stack ready for institutional deployments",
+            "Deployment and recovery flows suited to real operators",
         ],
         "code_sample": (
             "# Node configuration\n"
             "xian_node = Node(\n"
             "    network='mainnet',\n"
-            "    sync_mode='fast',\n"
+            "    state_sync=True,\n"
             "    metrics=True\n"
             ")"
         ),
@@ -193,8 +196,8 @@ TECHNOLOGY_TRACKS = [
         "title": "Secure Upgrades",
         "icon": "shield",
         "description": (
-            "Provide governance tooling that keeps production contracts evolving without "
-            "downtime, leveraging migration kits and formal verification hooks."
+            "Provide upgrade and migration tooling that keeps production networks evolving "
+            "without making the operational story fragile."
         ),
         "points": [
             "Versioned contract archetypes with automated changelog diffing",
