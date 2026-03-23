@@ -30,44 +30,41 @@ FAQ_ITEMS = [
         "question": "What is the Xian Network and what is its goal?",
         "answer": [
             (
-                "The Xian Network is an independent Layer 1 blockchain that runs on the Xian Technology stack. "
-                "Its goal is to prove that the stack works in a real-world environment while staying simple to use."
+                "The Xian Network is the live public network built on the Xian Technology stack. "
+                "Its role is to prove the stack in a real-world environment while remaining usable and understandable."
             ),
             (
-                "It is not a demo network. It is a live cryptocurrency project with a bridge to Solana and exchange "
-                "listings, integrated into the broader crypto ecosystem. The long-term goal is full decentralization "
-                "and a strong platform for Python developers to build smart contracts and applications. Learn more at xian.org."
+                "It is not a demo network. It is a live cryptocurrency network integrated into the broader crypto ecosystem. "
+                "The larger goal is not just to run one chain, but to show that the Xian stack can support simple but powerful contracts, "
+                "programmable networks, and real application integration. Learn more at xian.org."
             ),
         ],
     },
     {
-        "id": "top-100",
-        "question": "Can the Xian Network become a top 100 cryptocurrency?",
+        "id": "general-purpose-competition",
+        "question": "Is Xian trying to compete with the biggest general-purpose chains?",
         "answer": [
             (
-                "In theory, yes. The network is fast, offers Ethereum-class contract capabilities, and lowers the barrier "
-                "to entry by using Python."
+                "Not as its primary goal. Xian is not trying to win by being the fastest or most broadly capitalized chain in the market."
             ),
             (
-                "Realistically, a top-100 position is unlikely without significant funding and marketing. The original project "
-                "that created the contracting engine raised around $12M but later dissolved, leaving the community without "
-                "resources. The current Xian Network effort was started with roughly $150k from dedicated supporters—an amount "
-                "that is meaningful for core development but not enough for large-scale promotion in a crowded market."
+                "The stronger strategic fit is as a Python-first decentralized application platform: easy smart contracts, flexible "
+                "network composition, and software-friendly integration. If Xian is judged only by generic chain competition metrics, "
+                "it is being judged by the wrong standard."
             ),
         ],
     },
     {
         "id": "xian-performance",
-        "question": "How fast can a Xian Technology based blockchain be, and what's the TPS?",
+        "question": "Is performance or TPS the main point of Xian?",
         "answer": [
             (
-                "Because every transaction is a Python contract call, performance is constrained by Python's execution speed. "
-                "Even so, early stress tests during Xian Network development observed roughly 2,200 transactions per 2-second block "
-                "(about 1,100 TPS)."
+                "No. Performance still matters, but it is not the main reason to use Xian."
             ),
             (
-                "The current ABCI app runs transactions sequentially and has not yet been optimized for throughput. Parallelism and "
-                "further tuning are planned, but the existing performance is already sufficient for current needs."
+                "Xian is aimed at teams that value ease of use, simple but powerful contracts, flexible network setup, and clean integration "
+                "with normal software systems. It should be improved where performance helps the product, but it is not intended to compete "
+                "primarily as a throughput-first chain."
             ),
         ],
     },
@@ -151,11 +148,10 @@ FAQ_ITEMS = [
         "question": "What's the vision of the Xian Foundation?",
         "answer": [
             (
-                "Build Xian Technology into a robust stack that individuals, communities, and companies can set up quickly."
+                "Build Xian Technology into a Python-first decentralized application platform that individuals, communities, and companies can understand, deploy, and integrate without unnecessary friction."
             ),
             (
-                "The aim is to make launching decentralized or distributed networks simple, with sensible defaults and enough "
-                "flexibility to customize when needed."
+                "The aim is to make programmable decentralized networks simple to launch, straightforward to operate, and flexible enough to adapt when needed."
             ),
         ],
     },

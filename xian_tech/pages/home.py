@@ -26,28 +26,28 @@ QUOTE_GAP_HALF = "0.75rem"
 
 SEARCH_SECTIONS = [
     {
-        "title": "Python-Native Contracting on a CometBFT Backbone",
-        "subtitle": "CometBFT-backed consensus with a pure Python contracting engine.",
+        "title": "Python-First Decentralized Infrastructure",
+        "subtitle": "Programmable networks, easy smart contracts, and software-friendly integration.",
         "category": "Home",
         "badge": "Hero",
         "href": "/",
-        "keywords": ["Python", "CometBFT", "Contracting", "Smart contracts"],
+        "keywords": ["Python", "Programmable networks", "Integration", "Smart contracts"],
     },
     {
-        "title": "Another Blockchain?",
-        "subtitle": "A universal stack built on familiar infrastructure instead of niche tooling.",
+        "title": "Why Xian?",
+        "subtitle": "Decentralized infrastructure that can be used like a tool, not just a chain.",
         "category": "Home",
         "badge": "Section",
         "href": "/",
-        "keywords": ["Infrastructure", "Universal ledger", "Adoption"],
+        "keywords": ["Infrastructure", "Tool", "Programmable networks", "Adoption"],
     },
     {
         "title": "Why Python?",
-        "subtitle": "Python-first contracts that trade speed for clarity, safety, and adoption.",
+        "subtitle": "Python-first contracts that optimize for clarity, integration, and ease of use.",
         "category": "Home",
         "badge": "Section",
         "href": "/",
-        "keywords": ["Python", "Contracts", "Performance"],
+        "keywords": ["Python", "Contracts", "Integration", "Usability"],
     },
     {
         "title": "Quotes on Python",
@@ -78,7 +78,7 @@ def hero_section() -> rx.Component:
                 border_radius="8px",
             ),
             rx.heading(
-                "Python-Native Contracting on a CometBFT Backbone",
+                "Python-First Infrastructure for Programmable Networks",
                 size="9",
                 line_height="1.1",
                 color=TEXT_PRIMARY,
@@ -87,8 +87,9 @@ def hero_section() -> rx.Component:
                 weight="bold",
             ),
             rx.text(
-                "Xian is a CometBFT-backed blockchain with a pure Python contracting engine. "
-                "Write native Python contracts—no transpilers—while combining fast consensus with the simplicity and power of Python.",
+                "Xian is a Python-first decentralized application platform. Build app-specific "
+                "networks, write simple but powerful smart contracts, and integrate programmable "
+                "shared state into normal software systems without adopting a highly specialized stack.",
                 size="5",
                 color=TEXT_MUTED,
                 max_width="700px",
@@ -161,7 +162,7 @@ def stack_overview() -> rx.Component:
     return section(
         rx.vstack(
             rx.text(
-                "A streamlined stack that pairs CometBFT consensus with a pure Python execution layer and tooling.",
+                "A streamlined stack for running programmable decentralized networks with clear execution, strong tooling, and software-friendly integration surfaces.",
                 size="4",
                 color=TEXT_MUTED,
                 max_width="820px",
@@ -201,7 +202,7 @@ def mission_section() -> rx.Component:
         rx.vstack(
             linked_heading("Our Mission", size="7", color=TEXT_PRIMARY, weight="bold"),
             rx.text(
-                "The Xian Technology Foundation advances the technology stack behind Xian to keep it simple, powerful, and production-ready.",
+                "The Xian Technology Foundation advances Xian as a Python-first decentralized application platform that stays simple, flexible, and operationally clear.",
                 size="4",
                 color=TEXT_MUTED,
                 line_height="1.7",
@@ -259,9 +260,9 @@ def why_another_blockchain() -> rx.Component:
     return section(
         rx.grid(
             rx.vstack(
-                linked_heading("Another Blockchain?", size="7", color=TEXT_PRIMARY, weight="bold"),
+                linked_heading("Why Xian?", size="7", color=TEXT_PRIMARY, weight="bold"),
                 rx.text(
-                    "Blockchains are shifting away from bespoke, blockchain-only stacks toward ones built on familiar technology—avoiding niche languages and tools you never see outside crypto. The goal is a universal stack that plugs into existing infrastructure and is straightforward to deploy and operate. Our aim is to to deliver a simple yet powerful software stack that companies and communities can run themselves when they want their own decentralized ledger.",
+                    "Xian exists for teams that need decentralized coordination or shared programmable state, but do not want to adopt a niche contract language or a hard-to-operate blockchain stack. The aim is to make decentralized infrastructure feel more like a practical software tool and less like a specialized ecosystem you have to re-learn from scratch.",
                     size="4",
                     color=TEXT_MUTED,
                     line_height="1.7",
@@ -276,14 +277,14 @@ def why_another_blockchain() -> rx.Component:
         rx.box(
             rx.text(
                 rx.fragment(
-                    "A practical example of this shift is ",
+                    "A practical example of the broader shift is ",
                     rx.link(
                         "Google’s Universal Ledger (GCUL)",
                         href="https://cloud.google.com/application/web3/universal-ledger",
                         is_external=True,
                         color=ACCENT,
                     ),
-                    ": a managed, programmable ledger on familiar cloud primitives. It uses Python as its programmable layer, underscoring the move toward mainstream tooling over blockchain-only stacks.",
+                    ": a managed, programmable ledger on familiar cloud primitives. It reflects the same general direction: programmable ledger infrastructure becoming easier to embed into normal software and operations environments.",
                 ),
                 size="3",
                 color=TEXT_MUTED,
@@ -293,7 +294,7 @@ def why_another_blockchain() -> rx.Component:
         ),
         rx.box(
             rx.text(
-                "The Xian software stack aims to be a free, open alternative to offerings like GCUL—built on familiar technology, ready to run on-prem or in the cloud, and suited for your next distributed or decentralized project.",
+                "The Xian software stack aims to be a free, open alternative in that direction: ready to run on-prem or in the cloud, easy to adapt, and suited for application-specific decentralized projects that value clarity, flexibility, and integration.",
                 size="3",
                 color=TEXT_MUTED,
                 line_height="1.7",
@@ -387,7 +388,7 @@ def why_python() -> rx.Component:
                     anchor_id="why-python-trends",
                 ),
                 rx.text(
-                    "Python is one of the most used programming languages worldwide but is barely used in the blockchain world. At Xian, everything user-facing—including smart contracts—is Python-based, while we also ship JS tooling for web integrations. Python is slower than specialized smart-contract languages, but Xian still delivers strong performance, and the trade-off buys us the clarity, safety, and adoption of Python.",
+                    "Python is one of the most used programming languages worldwide but is still underused in decentralized infrastructure. At Xian, the developer-facing story is Python-first because the goal is to make programmable networks easier to understand, integrate, and operate. The point is not to win raw throughput benchmarks; it is to make the useful parts of decentralization easier for normal engineering teams to adopt.",
                     size="4",
                     color=TEXT_MUTED,
                     line_height="1.7",
