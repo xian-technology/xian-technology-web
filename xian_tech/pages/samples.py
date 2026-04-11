@@ -41,12 +41,12 @@ SEARCH_SECTIONS = [
     },
     {
         "id": "samples-scenario-contract-call-guardrails",
-        "title": "Scenario: Simulate, Stamp, Submit",
-        "subtitle": "Preview state deltas, validate expected output, then submit with simulated stamps.",
+        "title": "Scenario: Simulate, Estimate, Submit",
+        "subtitle": "Preview state deltas, validate expected output, then submit with simulated chi.",
         "category": "Developers",
         "badge": "Scenario",
         "href": "/samples#scenario-contract-call-guardrails",
-        "keywords": ["simulate", "send_tx", "state", "stamps", "dex", "slippage"],
+        "keywords": ["simulate", "send_tx", "state", "chi", "dex", "slippage"],
     },
     {
         "id": "samples-scenario-bds-retrieval",
@@ -277,7 +277,7 @@ def _state_value(changes: list[dict], key: str):
     return None
 
 
-# 1) Simulate the exact tx to get projected state changes and stamp usage.
+# 1) Simulate the exact tx to get projected state changes and chi usage.
 simulation = xian.simulate(DEX_CONTRACT, BUY_FUNCTION, kwargs)
 if simulation.get("status") != 0:
     raise RuntimeError(f"Simulation failed: {simulation}")
@@ -295,23 +295,23 @@ if simulated_tokens_out < EXPECTED_MIN_OUT:
         f"Expected at least {EXPECTED_MIN_OUT}, simulation returned {simulated_tokens_out}"
     )
 
-# 3) Use simulated stamp usage as tx stamp budget for the real call.
-stamps = int(simulation["stamps_used"])
+# 3) Use simulated chi usage as the tx chi budget for the real call.
+chi = int(simulation["chi_used"])
 submit = xian.send_tx(
     DEX_CONTRACT,
     BUY_FUNCTION,
     kwargs,
-    stamps=stamps,
-    synchronous=True,
+    chi=chi,
+    mode="commit",
 )
-if not submit.get("success"):
-    raise RuntimeError(submit.get("message", "submit failed"))
+if submit.receipt is None or not submit.receipt.success:
+    raise RuntimeError(submit.receipt.message if submit.receipt else "submit failed")
 
 print(
     {
         "simulated_tokens_out": simulated_tokens_out,
-        "stamps": stamps,
-        "tx_hash": submit.get("tx_hash"),
+        "chi": chi,
+        "tx_hash": submit.tx_hash,
     }
 )'''
 
@@ -538,7 +538,7 @@ def samples_page() -> rx.Component:
                 ),
                 rx.grid(
                     _scenario_jump_card(
-                        title="Simulate, Stamp, Submit",
+                        title="Simulate, Estimate, Submit",
                         description="Preview simulated state deltas and only submit when expected output passes checks.",
                         target="scenario-contract-call-guardrails",
                         icon="code",
@@ -566,7 +566,7 @@ def samples_page() -> rx.Component:
             section_panel(
                 rx.vstack(
                     linked_heading(
-                        "Scenario 1: Simulate, Stamp, Submit",
+                        "Scenario 1: Simulate, Estimate, Submit",
                         anchor_id="scenario-contract-call-guardrails",
                         size="6",
                         color=TEXT_PRIMARY,
@@ -596,8 +596,8 @@ def samples_page() -> rx.Component:
                             _ordered_step_item(1, "Simulate the exact tx payload."),
                             _ordered_step_item(2, "Read the predicted token-out delta from simulated state."),
                             _ordered_step_item(3, "Abort when simulated output is below expectation."),
-                            _ordered_step_item(4, "Set `stamps` from simulation `stamps_used`."),
-                            _ordered_step_item(5, "Submit the real `send_tx` call with that stamp budget."),
+                            _ordered_step_item(4, "Set `chi` from simulation `chi_used`."),
+                            _ordered_step_item(5, "Submit the real `send_tx` call with that chi budget."),
                             spacing="2",
                             align_items="start",
                         ),
@@ -615,7 +615,7 @@ def samples_page() -> rx.Component:
                             _bullet_item("Treat non-zero simulation status as a hard stop."),
                             _bullet_item("Fail when expected state keys are missing in simulation output."),
                             _bullet_item("Enforce minimum output thresholds before broadcasting."),
-                            _bullet_item("Use simulated stamps to avoid underfunded tx attempts."),
+                            _bullet_item("Use simulated chi to avoid underfunded tx attempts."),
                             _bullet_item("Handle unsuccessful submit responses as terminal failures."),
                             spacing="2",
                             align_items="start",

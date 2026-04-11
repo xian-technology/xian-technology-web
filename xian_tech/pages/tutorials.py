@@ -737,7 +737,7 @@ def tutorials_page() -> rx.Component:
                     _tutorial_step(
                         2,
                         "Implement the write path",
-                        why="Validate all on-chain mutations before writes: writes consume stamps, and Contracting has no `try/except` recovery.",
+                        why="Validate all on-chain mutations before writes: writes consume chi, and Contracting has no `try/except` recovery.",
                         how="Create a `save(key, value)` export, guard invalid input with `assert`, then write to `records[key]` in one explicit mutation path.",
                         snippet=STORE_DATA_STEP_2,
                     ),

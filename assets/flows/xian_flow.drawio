@@ -16,7 +16,7 @@
         <mxCell id="12" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#EAF1FF;strokeColor=#3C78D8;fontSize=11;align=center;verticalAlign=middle;spacing=6;" value="&lt;b&gt;RUNTIME&lt;/b&gt;&lt;br&gt;Xian runtime executes Python directly in the deterministic interpreter" vertex="1">
           <mxGeometry height="80" width="172" x="420" y="80" as="geometry" />
         </mxCell>
-        <mxCell id="13" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#F5ECF8;strokeColor=#9673A6;fontSize=11;align=center;verticalAlign=middle;spacing=6;" value="&lt;b&gt;STATE / OUTPUT&lt;/b&gt;&lt;br&gt;Stamp-metered execution updates and reads contract state" vertex="1">
+        <mxCell id="13" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#F5ECF8;strokeColor=#9673A6;fontSize=11;align=center;verticalAlign=middle;spacing=6;" value="&lt;b&gt;STATE / OUTPUT&lt;/b&gt;&lt;br&gt;Chi-metered execution updates and reads contract state" vertex="1">
           <mxGeometry height="80" width="172" x="616" y="80" as="geometry" />
         </mxCell>
         <mxCell id="200" edge="1" parent="1" source="10" style="endArrow=block;endFill=1;html=1;rounded=1;strokeWidth=2;edgeStyle=orthogonalEdgeStyle;" target="11">

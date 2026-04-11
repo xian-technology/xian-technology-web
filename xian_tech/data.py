@@ -140,7 +140,7 @@ BDS_COMPONENTS = [
     },
     {
         "title": "Complete transaction history",
-        "description": "Capture every transaction—successes and failures—with status, stamps, contract/function, and block metadata for auditing.",
+        "description": "Capture every transaction—successes and failures—with status, chi, contract/function, and block metadata for auditing.",
         "icon": "history",
     },
     {

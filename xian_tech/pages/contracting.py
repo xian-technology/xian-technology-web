@@ -242,7 +242,7 @@ HIGHLIGHTS = [
             "Fees are deterministic and compute-based, so outcomes and costs can be simulated before a transaction is sent."
         ),
         "detail": (
-            "Stamps map directly to the computation required for contract execution. A dry run yields both the expected result "
+            "Chi maps directly to the computation required for contract execution. A dry run yields both the expected result "
             "and the exact fee, so you can verify the outcome or opt out before spending."
         ),
     },
@@ -356,7 +356,7 @@ WHY_IT_MATTERS = [
 SEARCH_SECTIONS = [
     {
         "title": "Pure Python Smart Contracts",
-        "subtitle": "Deterministic, stamp-metered execution with native Python contracts.",
+        "subtitle": "Deterministic, chi-metered execution with native Python contracts.",
         "category": "Technology",
         "badge": "Page",
         "href": "/contracting",
@@ -449,7 +449,7 @@ def contracting_page() -> rx.Component:
                     weight="bold",
                 ),
                 rx.text(
-                    "The heart of Xian is a native Python contracting engine—no transpilers, no second-class runtimes. Deterministic, stamp-metered execution keeps performance predictable while making audits and upgrades straightforward.",
+                    "The heart of Xian is a native Python contracting engine—no transpilers, no second-class runtimes. Deterministic, chi-metered execution keeps performance predictable while making audits and upgrades straightforward.",
                     size="4",
                     color=TEXT_MUTED,
                     width="100%",
@@ -486,7 +486,7 @@ def contracting_page() -> rx.Component:
                             width="100%",
                         ),
                         rx.text(
-                            "The contracting engine executes pure Python contracts with deterministic rules and a stamp-metered "
+                            "The contracting engine executes pure Python contracts with deterministic rules and a chi-metered "
                             "budget. It keeps developer ergonomics high without compromising on predictable execution.",
                             size="3",
                             color=TEXT_MUTED,
