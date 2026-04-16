@@ -311,7 +311,7 @@ def api_page() -> rx.Component:
                         section_action_links(
                             [
                                 {"label": "RPC Docs", "icon": "book_open", "href": "https://docs.cometbft.com/main/rpc"},
-                                {"label": "JSON-RPC Spec", "icon": "scroll_text", "href": "https://docs.cometbft.com/v0.38/spec/rpc/"},
+                                {"label": "JSON-RPC Spec", "icon": "scroll_text", "href": "https://docs.cometbft.com/v0.39/spec/rpc/"},
                             ]
                         ),
                         direction={"base": "column", "md": "row"},

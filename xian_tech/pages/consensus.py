@@ -125,7 +125,7 @@ def consensus_page() -> rx.Component:
                             [
                                 {"label": "Repo", "icon": "github", "href": "https://github.com/cometbft/cometbft"},
                                 {"label": "DeepWiki", "icon": "brain", "href": "https://deepwiki.com/cometbft/cometbft"},
-                                {"label": "Docs", "icon": "book_open", "href": "https://docs.cometbft.com/v0.38"},
+                                {"label": "Docs", "icon": "book_open", "href": "https://docs.cometbft.com/v0.39"},
                             ]
                         ),
                         direction={"base": "column", "md": "row"},
