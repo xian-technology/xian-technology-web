@@ -8,6 +8,19 @@ Fizzy-backed roadmap view.
 This repo is the *brand site*, not the documentation. Developer
 documentation lives in [`xian-docs-web`](../xian-docs-web).
 
+## Site Flow
+
+```mermaid
+flowchart LR
+  Visitor["Site visitor"] --> Reflex["Reflex app"]
+  Reflex --> StaticContent["Static brand content"]
+  Reflex --> Roadmap["Fizzy roadmap client"]
+  Reflex --> Contact["SMTP contact form"]
+  Roadmap --> Fizzy["Fizzy API"]
+  Contact --> Mail["Outgoing mail"]
+  Docs["xian-docs-web"] -. developer docs .-> Visitor
+```
+
 ## Quick Start
 
 ```bash
