@@ -27,7 +27,7 @@ poetry run pytest
 - `export --frontend-only` builds static assets and helps debug frontend build issues.
 
 ## Coding Style & Naming Conventions
-- Target Python 3.11 with 4-space indentation and PEP 8 style.
+- Target Python 3.14 with 4-space indentation and PEP 8 style.
 - Use `snake_case` for modules/functions, `PascalCase` for classes, and descriptive route/page names.
 - Keep shared UI in `xian_tech/components/` instead of duplicating page markup.
 - Keep content/config data centralized in `xian_tech/data.py` when practical.

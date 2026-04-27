@@ -5,7 +5,7 @@ for the Xian stack, and the Fizzy-backed roadmap view.
 
 ## Prerequisites
 
-- Python 3.11 (required by `pyproject.toml`).
+- Python 3.14 (required by `pyproject.toml`).
 - Poetry for dependency management.
 - Node.js >= 18 or Bun >= 1.1 (Reflex builds the frontend with whichever runtime is on your `PATH`).
 - A compiler toolchain for any transitive dependencies (for example `make`, `gcc`, `pkg-config`).
@@ -282,7 +282,7 @@ After=network.target
 Type=simple
 User=endogen
 WorkingDirectory=/home/endogen/xian-tech
-Environment="PATH=/home/endogen/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/endogen/.cache/pypoetry/virtualenvs/xian-tech--py3.11/bin"
+Environment="PATH=/home/endogen/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/endogen/.cache/pypoetry/virtualenvs/xian-tech--py3.14/bin"
 ExecStart=/home/endogen/.local/bin/poetry run reflex run --env prod --single-port --frontend-port 8001 --backend-port 8001
 Restart=on-failure
 RestartSec=5
