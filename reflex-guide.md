@@ -35,10 +35,10 @@ State & Data Management
 - For static marketing sections, prefer simple constants/lists and pure component factories to avoid unnecessary state.  
   
 Build, Run, Test  
-- Install deps: `poetry install`.  
-- Dev server: `poetry run reflex run` (binds to :3000, falls back to 3001 if occupied).  
-- Static export: `poetry run reflex export --frontend-only`.  
-- Syntax check: `poetry run python -m compileall xian_tech`.  
+- Install deps: `uv sync`.  
+- Dev server: `uv run reflex run` (binds to :3000, falls back to 3001 if occupied).  
+- Static export: `uv run reflex export --frontend-only`.  
+- Syntax check: `uv run python -m compileall xian_tech`.  
 - When adding tests, use `pytest` under `tests/`; mirror module names (`test_hero_section.py`).  
   
 Common Pitfalls & Debugging  

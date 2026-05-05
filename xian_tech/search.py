@@ -109,7 +109,7 @@ def _build_search_entries() -> list[dict[str, Any]]:
         {
             "id": "technology-get-started",
             "title": "Deploy your first smart contract",
-            "subtitle": "pip install xian-py → xian init → xian deploy",
+            "subtitle": "uv add xian-tech-py → xian init → xian deploy",
             "category": "Technology",
             "badge": "Guide",
             "href": "/contracting",

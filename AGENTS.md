@@ -10,16 +10,16 @@
 - Root config lives in `pyproject.toml`, `rxconfig.py`, and `README.md`.
 
 ## Build, Test, and Development Commands
-Use Poetry for all Python commands:
+Use uv for all Python commands:
 
 ```bash
-poetry install
-poetry run reflex run
-poetry run reflex run --env dev
-poetry run reflex run --env prod --single-port --frontend-port 8001 --backend-port 8001
-poetry run reflex export --frontend-only
-poetry run python -m compileall xian_tech
-poetry run pytest
+uv sync
+uv run reflex run
+uv run reflex run --env dev
+uv run reflex run --env prod --single-port --frontend-port 8001 --backend-port 8001
+uv run reflex export --frontend-only
+uv run python -m compileall xian_tech
+uv run pytest
 ```
 
 - `reflex run` starts local development.

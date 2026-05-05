@@ -24,7 +24,7 @@ from ..theme import (
     TEXT_PRIMARY,
 )
 
-SDK_INSTALL_COMMAND = "pip install xian-py"
+SDK_INSTALL_COMMAND = "uv add xian-tech-py"
 SDK_WALLET_EXAMPLE = """from xian_py import Wallet
 
 wallet = Wallet()
@@ -835,7 +835,7 @@ def tooling_page() -> rx.Component:
                             align_items="center",
                         ),
                         rx.vstack(
-                            _feature_item_with_code("Install with `pip install xian-linter`."),
+                            _feature_item_with_code("Install with `uv add xian-tech-linter`."),
                             _feature_item_with_code("Run linting directly via `lint_code_inline(contract_code)`."),
                             _feature_item_with_code("Ideal for pre-commit checks, CI gates, and deploy scripts."),
                             _feature_item_with_code("Pass custom `whitelist_patterns` for expected symbols."),
@@ -854,7 +854,7 @@ def tooling_page() -> rx.Component:
                             align_items="center",
                         ),
                         rx.vstack(
-                            _feature_item_with_code("Install API extras via `pip install xian-linter[server]`."),
+                            _feature_item_with_code("Install API extras via `uv add \"xian-tech-linter[server]\"`."),
                             _feature_item_with_code("Run with `xian-linter` or `python -m xian_linter`."),
                             _feature_item_with_code("Expose `POST /lint_base64` and `POST /lint_gzip`."),
                             _feature_item_with_code("Use `whitelist_patterns` query param for ignored patterns."),

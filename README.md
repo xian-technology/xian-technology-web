@@ -24,21 +24,21 @@ flowchart LR
 ## Quick Start
 
 ```bash
-poetry install
-poetry run reflex run                         # local dev
+uv sync
+uv run reflex run                         # local dev
 ```
 
 Production (single-port — recommended behind a reverse proxy):
 
 ```bash
-poetry run reflex run --env prod --single-port \
+uv run reflex run --env prod --single-port \
   --frontend-port 8001 --backend-port 8001
 ```
 
 Production (split-port):
 
 ```bash
-poetry run reflex run --env prod
+uv run reflex run --env prod
 ```
 
 The runtime is configured in `rxconfig.py`. The app sets `REFLEX_SSR=0`
@@ -104,14 +104,14 @@ contact-form delivery; the static site renders without them.
   - `theme.py` — design tokens.
 - `assets/` — static assets served by Reflex.
 - `rxconfig.py` — Reflex runtime configuration.
-- `pyproject.toml`, `poetry.lock` — Poetry dependency configuration.
+- `pyproject.toml`, `uv.lock` — uv dependency configuration.
 - `reflex-guide.md` — Reflex-specific notes for contributors.
 
 ## Validation
 
 ```bash
-poetry install
-poetry run reflex run --env prod --frontend-only    # frontend-build smoke
+uv sync
+uv run reflex run --env prod --frontend-only    # frontend-build smoke
 ```
 
 ## Reverse Proxy Notes
@@ -130,7 +130,7 @@ poetry run reflex run --env prod --frontend-only    # frontend-build smoke
 ## Requirements
 
 - Python 3.14
-- Poetry
+- uv
 - Node.js ≥ 18 or Bun ≥ 1.1 (Reflex builds the frontend)
 - A compiler toolchain for transitive native dependencies
 
