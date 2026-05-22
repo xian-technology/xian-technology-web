@@ -1109,7 +1109,7 @@ def tooling_page() -> rx.Component:
                             ),
                             rx.text(
                                 "Covers node operations via xian-stack: joining mainnet/testnet, creating networks, "
-                                "validator and service node setup, monitoring, CometBFT configuration, and Docker "
+                                "validator and BDS node setup, monitoring, CometBFT configuration, and Docker "
                                 "deployment basics.",
                                 size="3",
                                 color=TEXT_MUTED,
