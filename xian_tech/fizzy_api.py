@@ -100,15 +100,7 @@ def get_board_cards(
     board_id: str,
     indexed_by: str | None = None,
 ) -> list[dict[str, Any]]:
-    # Fizzy API/CLI use board_ids[] list parameters.
     params: dict[str, Any] = {"board_ids[]": board_id}
     if indexed_by:
         params["indexed_by"] = indexed_by
-    results = get_paginated(base_url, account_slug, token, "/cards.json", params)
-    if results:
-        return results
-    # Backward compatibility for older/self-hosted deployments.
-    fallback_params: dict[str, Any] = {"board_ids": board_id}
-    if indexed_by:
-        fallback_params["indexed_by"] = indexed_by
-    return get_paginated(base_url, account_slug, token, "/cards.json", fallback_params)
+    return get_paginated(base_url, account_slug, token, "/cards.json", params)
