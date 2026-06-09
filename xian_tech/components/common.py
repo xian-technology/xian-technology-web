@@ -10,7 +10,6 @@ from ..theme import (
     ACCENT,
     ACCENT_GLOW,
     ACCENT_SOFT,
-    BORDER_BRIGHT,
     BORDER_COLOR,
     CODE_BG,
     MAX_CONTENT_WIDTH,
@@ -23,7 +22,6 @@ from ..theme import (
     TOP_GRADIENT,
 )
 
-MD_MEDIA = "@media (min-width: 1024px)"
 NAV_DROPDOWN_LABELS = [link["label"] for link in NAV_LINKS if link.get("children")]
 HEADER_CONTROL_HEIGHT = "2.6rem"
 HEADER_CONTROL_RADIUS = "12px"
@@ -625,57 +623,6 @@ def command_palette_button() -> rx.Component:
         min_width=rx.breakpoints(initial=HEADER_CONTROL_HEIGHT, md="0"),
         justify_content=rx.breakpoints(initial="center", md="flex-start"),
         **_header_control_style(),
-    )
-
-
-def nav_dropdown(link: dict[str, Any]) -> rx.Component:
-    """Hoverable dropdown for links with children."""
-    items = link.get("children", [])
-    if not items:
-        return nav_link(link)
-
-    return rx.hover_card.root(
-        rx.hover_card.trigger(nav_link(link)),
-        rx.hover_card.content(
-            rx.vstack(
-                *[
-                    rx.link(
-                        rx.vstack(
-                            rx.text(child["label"], size="1", weight="bold", color=TEXT_PRIMARY),
-                            rx.text(child["description"], size="2", color=TEXT_MUTED, line_height="1.5"),
-                            spacing="1",
-                            align_items="start",
-                        ),
-                        href=child["href"],
-                        _hover={
-                            "textDecoration": "none",
-                            "color": ACCENT,
-                            "background": SURFACE_BRIGHT,
-                            "boxShadow": "0 12px 32px rgba(0,0,0,0.16)",
-                        },
-                        padding="0.8rem 0.9rem",
-                        border_radius="10px",
-                        width="100%",
-                        transition="transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, color 0.2s ease",
-                        display="block",
-                    )
-                    for child in items
-                ],
-                spacing="3",
-                align_items="start",
-            ),
-            side="bottom",
-            side_offset=10,
-            align="start",
-            padding="1rem",
-            background=SURFACE_BRIGHT,
-            border=f"1px solid {BORDER_BRIGHT}",
-            border_radius="8px",
-            box_shadow="0 20px 36px rgba(0,0,0,0.35)",
-            min_width="260px",
-        ),
-        open_delay=80,
-        close_delay=120,
     )
 
 

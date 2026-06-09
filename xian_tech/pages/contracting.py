@@ -15,8 +15,6 @@ from ..theme import (
     ACCENT,
     ACCENT_GLOW,
     ACCENT_SOFT,
-    BORDER_COLOR,
-    SURFACE,
     TEXT_MUTED,
     TEXT_PRIMARY,
 )
