@@ -134,7 +134,7 @@ uv run reflex run --env prod --frontend-only    # frontend-build smoke
 - Node.js ≥ 18 or Bun ≥ 1.1 (Reflex builds the frontend)
 - A compiler toolchain for transitive native dependencies
 
-## Related Repos
+## Related Docs
 
 - [`../xian-docs-web/README.md`](../xian-docs-web/README.md) — public developer documentation site
 - [`reflex-guide.md`](reflex-guide.md) — Reflex-specific contributor notes
