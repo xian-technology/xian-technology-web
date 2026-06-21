@@ -53,3 +53,8 @@ Due to the difficulty of implementing this codebase, we must strive to keep the 
 In some cases, you will be asked to perform a seemingly impossible task, either because it is (and the user is unaware), or because you don't grasp how to do it properly. In these cases, DO NOT ATTEMPT TO IMPLEMENT A HALF-BAKED SOLUTION JUST TO SATISFY THE USER'S REQUEST. If the task seems too hard, be honest that you couldn't solve it in the proper way, leave the code unchanged, explain the situation to the user and ask for further feedback and clarifications.
 
 The user is a domain expert that will be able to assist you in these cases.
+
+## Local Knowledge Graph
+- If `graphify-out/graph.json` exists, prefer `graphify query`, `graphify path`, or `graphify explain` for broad architecture and impact questions before scanning files manually.
+- Treat `graphify-out/` as a generated local artifact; it is intentionally ignored by Git.
+- After structural code changes, refresh the local graph with `graphify update .` when useful.
