@@ -1,4 +1,5 @@
 """Lightweight Fizzy API helper (no client dependency)."""
+
 from __future__ import annotations
 
 import json
@@ -6,8 +7,42 @@ import re
 
 from typing import Any
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode
-from urllib.request import Request, urlopen
+from urllib.parse import urlencode, urljoin, urlsplit, urldefrag
+from urllib.request import HTTPRedirectHandler, Request, build_opener
+
+
+MAX_PAGES = 100
+
+
+def _origin(url: str) -> tuple[str, str, int]:
+    parsed = urlsplit(url)
+    if (
+        parsed.scheme not in ("http", "https")
+        or not parsed.hostname
+        or parsed.username is not None
+        or parsed.password is not None
+    ):
+        raise ValueError("Fizzy URL must use an HTTP(S) origin without credentials")
+    return (
+        parsed.scheme,
+        parsed.hostname.lower(),
+        parsed.port if parsed.port is not None else (443 if parsed.scheme == "https" else 80),
+    )
+
+
+def _require_same_origin(base_url: str, url: str) -> str:
+    if _origin(url) != _origin(base_url):
+        raise ValueError("Fizzy pagination and redirects must stay on the configured origin")
+    return urldefrag(url)[0]
+
+
+class _SameOriginRedirect(HTTPRedirectHandler):
+    def __init__(self, base_url: str):
+        self.base_url = base_url
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        _require_same_origin(self.base_url, newurl)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
 def _build_url(base_url: str, account_slug: str, path: str) -> str:
@@ -41,6 +76,7 @@ def _request_json(
     if params:
         url += "?" + urlencode(params, doseq=True)
 
+    url = _require_same_origin(base_url, url)
     headers = {
         "Authorization": f"Bearer {token}",
         "Accept": "application/json",
@@ -48,7 +84,7 @@ def _request_json(
     }
     req = Request(url, headers=headers)
     try:
-        with urlopen(req, timeout=30) as resp:
+        with build_opener(_SameOriginRedirect(base_url)).open(req, timeout=30) as resp:
             body = resp.read()
             payload = json.loads(body) if body else None
             return payload, dict(resp.headers)
@@ -66,18 +102,25 @@ def get_paginated(
     path: str,
     params: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
-    data, headers = _request_json(base_url, account_slug, token, path, params)
+    next_url = _build_url(base_url, account_slug, path)
+    if params:
+        next_url += "?" + urlencode(params, doseq=True)
     results: list[dict[str, Any]] = []
-    if isinstance(data, list):
-        results.extend([item for item in data if isinstance(item, dict)])
-
-    next_url = _parse_link_next(headers.get("Link"))
+    seen: set[str] = set()
     while next_url:
+        next_url = _require_same_origin(base_url, next_url)
+        if next_url in seen:
+            raise ValueError("Fizzy pagination cycle detected")
+        if len(seen) >= MAX_PAGES:
+            raise ValueError("Fizzy pagination page limit exceeded")
+        seen.add(next_url)
         data, headers = _request_json(base_url, account_slug, token, next_url, None)
         if isinstance(data, list):
-            results.extend([item for item in data if isinstance(item, dict)])
-        next_url = _parse_link_next(headers.get("Link"))
-
+            results.extend(item for item in data if isinstance(item, dict))
+        link = _parse_link_next(
+            next((value for key, value in headers.items() if key.lower() == "link"), None)
+        )
+        next_url = urljoin(next_url, link) if link else ""
     return results
 
 

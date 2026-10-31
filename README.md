@@ -138,3 +138,8 @@ uv run reflex run --env prod --frontend-only    # frontend-build smoke
 
 - [`../xian-docs-web/README.md`](../xian-docs-web/README.md) — public developer documentation site
 - [`reflex-guide.md`](reflex-guide.md) — Reflex-specific contributor notes
+
+Fizzy pagination and redirects must stay on the configured HTTP(S) origin
+(scheme, host and port); URL credentials are rejected. Pagination rejects
+repeated URLs and stops at100 pages. Relative next-page links resolve against
+the current page. These failures use the roadmap’s existing load-error flow.
