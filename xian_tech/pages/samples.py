@@ -60,7 +60,7 @@ SEARCH_SECTIONS = [
 ]
 
 SCENARIO_TRANSFER_SYNC = '''from time import monotonic, sleep
-from xian_py import Wallet, Xian
+from xian_py import Wallet, Xian, XianClientConfig
 
 # Node RPC endpoint.
 NODE_URL = "http://node-ip:26657"
@@ -74,11 +74,11 @@ def wait_for_tx(xian: Xian, tx_hash: str, timeout_seconds: int = 45) -> dict:
         # Check latest tx status from the node.
         tx = xian.get_tx(tx_hash)
 
-        if tx.get("success") is True:
-            return tx
+        if tx.success:
+            return tx.raw
 
         # "Not found" usually means tx is still propagating/indexing.
-        message = str(tx.get("message", "")).lower()
+        message = str(tx.message).lower()
         if "not found" in message:
             sleep(2)
             continue
@@ -89,20 +89,20 @@ def wait_for_tx(xian: Xian, tx_hash: str, timeout_seconds: int = 45) -> dict:
     raise TimeoutError(f"Timed out waiting for tx {tx_hash}")
 
 
-def send_and_confirm(recipient: str, amount: float) -> dict:
+def send_and_confirm(recipient: str, amount: int | str) -> dict:
     # Build wallet + sync client for this workflow.
     wallet = Wallet()
-    xian = Xian(NODE_URL, wallet=wallet)
+    xian = Xian(NODE_URL, wallet=wallet, config=XianClientConfig(vm_profile="xian_vm_v2"))
 
     # Submit transfer transaction.
     submit = xian.send(amount=amount, to_address=recipient)
-    if not submit.get("success"):
-        raise RuntimeError(submit.get("message", "submit failed"))
+    if not submit.submitted or submit.accepted is False:
+        raise RuntimeError(submit.message or "submit failed")
 
     # If no hash is returned, forward submit response as-is.
-    tx_hash = submit.get("tx_hash")
+    tx_hash = submit.tx_hash
     if not tx_hash:
-        return submit
+        return submit.response
 
     # Otherwise wait for final tx resolution.
     return wait_for_tx(xian, tx_hash)
@@ -113,7 +113,7 @@ result = send_and_confirm("recipient_address", 5)
 print(result)'''
 
 SCENARIO_TRANSFER_ASYNC = '''import asyncio
-from xian_py import Wallet, XianAsync
+from xian_py import Wallet, XianAsync, XianClientConfig
 
 # Node RPC endpoint.
 NODE_URL = "http://node-ip:26657"
@@ -127,11 +127,11 @@ async def wait_for_tx(client: XianAsync, tx_hash: str, timeout_seconds: int = 45
         # Fetch the latest transaction state.
         tx = await client.get_tx(tx_hash)
 
-        if tx.get("success") is True:
-            return tx
+        if tx.success:
+            return tx.raw
 
         # Keep polling while tx is still not indexed.
-        message = str(tx.get("message", "")).lower()
+        message = str(tx.message).lower()
         if "not found" in message:
             await asyncio.sleep(2)
             continue
@@ -142,20 +142,20 @@ async def wait_for_tx(client: XianAsync, tx_hash: str, timeout_seconds: int = 45
     raise TimeoutError(f"Timed out waiting for tx {tx_hash}")
 
 
-async def transfer_with_confirmation(recipient: str, amount: float) -> dict:
+async def transfer_with_confirmation(recipient: str, amount: int | str) -> dict:
     wallet = Wallet()
 
     # Reuse a single async client session for submit + polling.
-    async with XianAsync(NODE_URL, wallet=wallet) as client:
+    async with XianAsync(NODE_URL, wallet=wallet, config=XianClientConfig(vm_profile="xian_vm_v2")) as client:
         # Broadcast transfer.
         submit = await client.send(amount=amount, to_address=recipient)
-        if not submit.get("success"):
-            raise RuntimeError(submit.get("message", "submit failed"))
+        if not submit.submitted or submit.accepted is False:
+            raise RuntimeError(submit.message or "submit failed")
 
         # Return immediate response if hash is unavailable.
-        tx_hash = submit.get("tx_hash")
+        tx_hash = submit.tx_hash
         if not tx_hash:
-            return submit
+            return submit.response
 
         # Otherwise wait for a final success/fail result.
         return await wait_for_tx(client, tx_hash)
@@ -168,8 +168,8 @@ SCENARIO_TRANSFER_WS_TRACKING = '''import asyncio
 import json
 import websockets
 
-from xian_py import Wallet, XianAsync
-from xian_py.encoding import decode_str
+from xian_py import Wallet, XianAsync, XianClientConfig
+from xian_py.transaction import decode_str
 
 # HTTP and websocket endpoints for the same node.
 NODE_HTTP = "http://node-ip:26657"
@@ -226,17 +226,17 @@ async def wait_for_tx_event(tx_hash: str, timeout_seconds: int = 45) -> tuple[bo
             return (success, detail if detail != "None" else "")
 
 
-async def send_and_confirm_ws(recipient: str, amount: float) -> tuple[bool, str]:
+async def send_and_confirm_ws(recipient: str, amount: int | str) -> tuple[bool, str]:
     wallet = Wallet()
 
     # Submit via HTTP RPC and confirm via websocket events.
-    async with XianAsync(NODE_HTTP, wallet=wallet) as client:
+    async with XianAsync(NODE_HTTP, wallet=wallet, config=XianClientConfig(vm_profile="xian_vm_v2")) as client:
         submit = await client.send(amount=amount, to_address=recipient)
-        if not submit.get("success"):
-            raise RuntimeError(submit.get("message", "submit failed"))
+        if not submit.submitted or submit.accepted is False:
+            raise RuntimeError(submit.message or "submit failed")
 
         # If no hash is available, treat submission as accepted.
-        tx_hash = submit.get("tx_hash")
+        tx_hash = submit.tx_hash
         if not tx_hash:
             return (True, "submitted without tx hash")
 
@@ -247,25 +247,36 @@ async def send_and_confirm_ws(recipient: str, amount: float) -> tuple[bool, str]
 # Example usage.
 print(asyncio.run(send_and_confirm_ws("recipient_address", 5)))'''
 
-SCENARIO_CONTRACT_GUARDRAILS = '''from xian_py import Wallet, Xian
+SCENARIO_CONTRACT_GUARDRAILS = '''from datetime import UTC, datetime, timedelta
+from decimal import Decimal
+from xian_runtime_types.decimal import ContractingDecimal
+from xian_py import Wallet, Xian, XianClientConfig
 
 NODE_URL = "http://node-ip:26657"
 
 # Wallet + client setup.
 wallet = Wallet()
-xian = Xian(NODE_URL, wallet=wallet)
+xian = Xian(NODE_URL, wallet=wallet, config=XianClientConfig(vm_profile="xian_vm_v2"))
 
 # Swap simulation target + acceptance threshold.
 DEX_CONTRACT = "con_dex"
-BUY_FUNCTION = "buy"
+SWAP_FUNCTION = "swapExactTokenForToken"
+TOKEN_IN = "con_token_a"
 TOKEN_OUT = "con_token_b"
-EXPECTED_MIN_OUT = 24.5
+EXPECTED_MIN_OUT = Decimal("24.5")
 
+# The funded wallet must have approved the router to spend 10 TOKEN_IN.
+pair = xian.get_state("con_pairs", "toks_to_pair", *sorted((TOKEN_IN, TOKEN_OUT)))
+if pair is None:
+    raise RuntimeError("The requested token pair has not been created")
+deadline = datetime.now(UTC) + timedelta(minutes=5)
 kwargs = {
-    "token_in": "con_token_a",
-    "token_out": TOKEN_OUT,
-    "amount_in": 10,
-    "min_amount_out": EXPECTED_MIN_OUT,
+    "amountIn": 10,
+    "amountOutMin": EXPECTED_MIN_OUT,
+    "pair": pair,
+    "src": TOKEN_IN,
+    "to": wallet.public_key,
+    "deadline": {"__time__": [*deadline.timetuple()[:6], deadline.microsecond]},
 }
 
 
@@ -278,18 +289,18 @@ def _state_value(changes: list[dict], key: str):
 
 
 # 1) Simulate the exact tx to get projected state changes and chi usage.
-simulation = xian.simulate(DEX_CONTRACT, BUY_FUNCTION, kwargs)
+simulation = xian.simulate(DEX_CONTRACT, SWAP_FUNCTION, kwargs)
 if simulation.get("status") != 0:
     raise RuntimeError(f"Simulation failed: {simulation}")
 
 # 2) Read predicted token-out amount from simulated state changes.
 out_key = f"{TOKEN_OUT}.balances:{wallet.public_key}"
-before_out = float(xian.get_state(TOKEN_OUT, "balances", wallet.public_key) or 0)
+before_out = xian.get_state(TOKEN_OUT, "balances", wallet.public_key) or 0
 after_out = _state_value(simulation.get("state", []), out_key)
 if after_out is None:
     raise RuntimeError(f"Simulation did not include expected key: {out_key}")
 
-simulated_tokens_out = float(after_out) - before_out
+simulated_tokens_out = ContractingDecimal(after_out) - before_out
 if simulated_tokens_out < EXPECTED_MIN_OUT:
     raise RuntimeError(
         f"Expected at least {EXPECTED_MIN_OUT}, simulation returned {simulated_tokens_out}"
@@ -299,7 +310,7 @@ if simulated_tokens_out < EXPECTED_MIN_OUT:
 chi = int(simulation["chi_used"])
 submit = xian.send_tx(
     DEX_CONTRACT,
-    BUY_FUNCTION,
+    SWAP_FUNCTION,
     kwargs,
     chi=chi,
     mode="commit",

@@ -31,31 +31,32 @@ wallet = Wallet()
 
 print(f"Address: {wallet.public_key}")
 print(f"Private key: {wallet.private_key}")"""
-SDK_BALANCE_EXAMPLE = """from xian_py import Xian, Wallet
+SDK_BALANCE_EXAMPLE = """from xian_py import Xian, Wallet, XianClientConfig
 
 wallet = Wallet()
-xian = Xian("http://node-ip:26657", wallet=wallet)
+xian = Xian("http://node-ip:26657", wallet=wallet, config=XianClientConfig(vm_profile="xian_vm_v2"))
 
 balance = xian.get_balance(wallet.public_key)
 print(f"Balance: {balance}")"""
-SDK_SEND_EXAMPLE = """from xian_py import Xian, Wallet
+SDK_SEND_EXAMPLE = """from xian_py import Xian, Wallet, XianClientConfig
 
 wallet = Wallet()
-xian = Xian("http://node-ip:26657", wallet=wallet)
+xian = Xian("http://node-ip:26657", wallet=wallet, config=XianClientConfig(vm_profile="xian_vm_v2"))
 
-result = xian.send(amount=10, to_address="recipient_address")
-print(f"Transaction successful: {result['success']}")"""
-SDK_CONTRACT_EXAMPLE = """from xian_py import Xian, Wallet
+result = xian.send(amount=10, to_address="recipient_address", mode="commit")
+print(f"Transaction successful: {bool(result.receipt and result.receipt.success)}")"""
+SDK_CONTRACT_EXAMPLE = """from xian_py import Xian, Wallet, XianClientConfig
 
 wallet = Wallet()
-xian = Xian("http://node-ip:26657", wallet=wallet)
+xian = Xian("http://node-ip:26657", wallet=wallet, config=XianClientConfig(vm_profile="xian_vm_v2"))
 
 result = xian.send_tx(
     contract="currency",
     function="transfer",
     kwargs={"to": "recipient_address", "amount": 100},
+    mode="commit",
 )
-print(f"Success: {result['success']}")"""
+print(f"Success: {bool(result.receipt and result.receipt.success)}")"""
 SDK_BDS_STATE_QUERY = """query QueryState {
   allStates(condition: {key: "currency.balances:some_address"}) {
     edges {

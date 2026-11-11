@@ -122,7 +122,7 @@ def balance_of(account: str):
 
 # Direct transfer between holders.
 @export
-def transfer(amount: float, to: str):
+def transfer(amount: decimal, to: str):
     assert amount > 0, 'amount must be positive'
     assert balances[ctx.caller] >= amount, 'insufficient funds'
     balances[ctx.caller] -= amount
@@ -130,13 +130,13 @@ def transfer(amount: float, to: str):
 
 TOKEN_STEP_4 = '''# Allow another address/contract to spend on your behalf.
 @export
-def approve(amount: float, to: str):
+def approve(amount: decimal, to: str):
     assert amount >= 0, 'amount must be non-negative'
     approvals[ctx.caller, to] = amount
 
 # Spend from `main_account` using allowance.
 @export
-def transfer_from(amount: float, to: str, main_account: str):
+def transfer_from(amount: decimal, to: str, main_account: str):
     assert amount > 0, 'amount must be positive'
     assert approvals[main_account, ctx.caller] >= amount, 'not approved'
     assert balances[main_account] >= amount, 'insufficient funds'
@@ -175,7 +175,7 @@ def balance_of(account: str):
 
 # Stage 4: Direct transfers.
 @export
-def transfer(amount: float, to: str):
+def transfer(amount: decimal, to: str):
     assert amount > 0, 'amount must be positive'
     assert balances[ctx.caller] >= amount, 'insufficient funds'
     balances[ctx.caller] -= amount
@@ -183,13 +183,13 @@ def transfer(amount: float, to: str):
 
 # Stage 5: Grant delegated spending allowance.
 @export
-def approve(amount: float, to: str):
+def approve(amount: decimal, to: str):
     assert amount >= 0, 'amount must be non-negative'
     approvals[ctx.caller, to] = amount
 
 # Stage 6: Spend via allowance.
 @export
-def transfer_from(amount: float, to: str, main_account: str):
+def transfer_from(amount: decimal, to: str, main_account: str):
     assert amount > 0, 'amount must be positive'
     assert approvals[main_account, ctx.caller] >= amount, 'not approved'
     assert balances[main_account] >= amount, 'insufficient funds'
@@ -225,7 +225,7 @@ def seed(owner_a: str, owner_b: str, owner_c: str, required: int = 2):
 
 MULTISIG_STEP_3 = '''# Create a transfer proposal and auto-approve by proposer.
 @export
-def propose_transfer(token_contract: str, to: str, amount: float):
+def propose_transfer(token_contract: str, to: str, amount: decimal):
     assert_owner()
     assert amount > 0, 'amount must be positive'
 
@@ -294,7 +294,7 @@ def seed(owner_a: str, owner_b: str, owner_c: str, required: int = 2):
 
 # Stage 4: Propose transfer.
 @export
-def propose_transfer(token_contract: str, to: str, amount: float):
+def propose_transfer(token_contract: str, to: str, amount: decimal):
     assert_owner()
     assert amount > 0, 'amount must be positive'
 
