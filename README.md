@@ -83,6 +83,11 @@ contact-form delivery; the static site renders without them.
 | `SMTP_USE_TLS`                          | Enable STARTTLS                                                             | `true`                         |
 | `SMTP_USE_SSL`                          | Enable SMTPS                                                                | `false`                        |
 | `CONTACT_SUBMISSION_COOLDOWN_SECONDS`   | Per-session contact-form throttle                                           | `30`                           |
+| `CONTACT_RATE_PER_CLIENT`               | Server-side contact submissions allowed per client address per window       | `3`                            |
+| `CONTACT_RATE_PER_CLIENT_WINDOW_SECONDS` | Window for the per-client contact limit                                     | `600`                          |
+| `CONTACT_RATE_GLOBAL`                   | Server-side contact submissions allowed across all clients per window       | `30`                           |
+| `CONTACT_RATE_GLOBAL_WINDOW_SECONDS`    | Window for the global contact limit                                         | `3600`                         |
+| `CONTACT_TRUSTED_PROXY_HOPS`            | Reverse proxies in front of the app; selects the client address from `X-Forwarded-For` (0 = socket peer) | `0`                            |
 
 `rxconfig.py` exposes:
 

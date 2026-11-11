@@ -1,19 +1,40 @@
 import asyncio
+import logging
 import os
-import re
 import time
 from typing import Any, TypedDict
 
 import reflex as rx
 from dotenv import load_dotenv
 
-from ..contact_email import send_contact_email
+from ..contact_email import compose_contact_email, send_contact_email
+from ..contact_guard import (
+    EMAIL_PATTERN,
+    INVALID_EMAIL_MESSAGE,
+    MISSING_MESSAGE_MESSAGE,
+    ContactSubmission,
+    contact_client_key,
+    limiter_from_env,
+    trusted_proxy_hops_from_env,
+    validate_contact_submission,
+)
+
 load_dotenv()
 
-EMAIL_PATTERN = re.compile(
-    r"^(?=.{3,254}$)(?=.{1,64}@)[A-Z0-9](?:[A-Z0-9._%+-]{0,62}[A-Z0-9])?@"
-    r"(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,63}$",
-    re.IGNORECASE,
+logger = logging.getLogger(__name__)
+
+# Shared by every websocket session in this backend process; per-session
+# state alone can be reset by reconnecting.
+contact_limiter = limiter_from_env()
+CONTACT_TRUSTED_PROXY_HOPS = trusted_proxy_hops_from_env()
+
+
+def _form_text(form_data: dict[str, Any], key: str, fallback: str = "") -> str:
+    return (form_data.get(key) or fallback or "").strip()
+
+
+CONTACT_SEND_FAILED_MESSAGE = (
+    "Message failed to send. Please try again later or email info@xian.technology."
 )
 
 
@@ -448,42 +469,30 @@ class State(rx.State):
             self.contact_submission_inflight = False
             return
 
-        name = (form_data.get("name") or "").strip()
-        email = (form_data.get("email") or self.contact_form_email or "").strip()
-        organization = (form_data.get("organization") or "").strip()
-        topic = (form_data.get("topic") or "").strip()
-        message = (form_data.get("message") or self.contact_form_message or "").strip()
-
-        if not email or not EMAIL_PATTERN.match(email):
-            self.contact_email_error = "Enter a valid email address (example: name@domain.com)."
-
-        if not message:
-            self.contact_message_error = "Please include a message so we can help."
-
-        if self.contact_email_error or self.contact_message_error:
-            self.contact_error = "Please fix the highlighted fields below."
+        submission = ContactSubmission(
+            name=_form_text(form_data, "name"),
+            email=_form_text(form_data, "email", self.contact_form_email),
+            organization=_form_text(form_data, "organization"),
+            topic=_form_text(form_data, "topic"),
+            message=_form_text(form_data, "message", self.contact_form_message),
+        )
+        validation = validate_contact_submission(submission)
+        if validation.form_error:
+            self.contact_email_error = validation.email_error
+            self.contact_message_error = validation.message_error
+            self.contact_error = validation.form_error
             self.contact_submission_inflight = False
             return
 
-        subject_bits = [topic or "Foundation contact"]
-        if name:
-            subject_bits.append(name)
-        elif email:
-            subject_bits.append(email)
-        subject = " - ".join(subject_bits)
+        client_key = contact_client_key(
+            self.router.headers.raw_headers, CONTACT_TRUSTED_PROXY_HOPS
+        )
+        if not contact_limiter.allow(client_key):
+            self.contact_error = "Too many messages right now. Please try again later."
+            self.contact_submission_inflight = False
+            return
 
-        body_lines = []
-        if name:
-            body_lines.append(f"Name: {name}")
-        if email:
-            body_lines.append(f"Email: {email}")
-        if organization:
-            body_lines.append(f"Organization: {organization}")
-        if topic:
-            body_lines.append(f"Topic: {topic}")
-        body_lines.append("")
-        body_lines.append(message or "(No message provided)")
-        body = "\n".join(body_lines)
+        subject, body = compose_contact_email(submission)
         recipient = os.getenv("CONTACT_EMAIL_TO", "info@xian.technology").strip()
         sender = os.getenv("CONTACT_EMAIL_FROM", "").strip()
         if not sender:
@@ -496,10 +505,13 @@ class State(rx.State):
                 body,
                 sender=sender,
                 recipient=recipient,
-                reply_to=email or None,
+                reply_to=submission.email,
             )
-        except Exception as exc:  # pragma: no cover - surface user-friendly errors
-            self.contact_error = f"Message failed to send. Error: {exc}"
+        except Exception:
+            # SMTP errors can carry relay hostnames and server replies; keep them
+            # in the server log and show visitors a generic message.
+            logger.exception("Contact form email delivery failed")
+            self.contact_error = CONTACT_SEND_FAILED_MESSAGE
         else:
             self.contact_status = "Message sent. The foundation will follow up soon."
             self.contact_last_sent_at = now
@@ -535,7 +547,7 @@ class State(rx.State):
             self.contact_email_error = "Email is required."
             return
         if not EMAIL_PATTERN.match(email):
-            self.contact_email_error = "Enter a valid email address (example: name@domain.com)."
+            self.contact_email_error = INVALID_EMAIL_MESSAGE
             return
         self.contact_email_error = ""
 
@@ -546,7 +558,7 @@ class State(rx.State):
         self.contact_status = ""
         self.contact_error = ""
         if not message:
-            self.contact_message_error = "Please include a message so we can help."
+            self.contact_message_error = MISSING_MESSAGE_MESSAGE
             return
         self.contact_message_error = ""
 

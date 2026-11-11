@@ -6,6 +6,8 @@ import os
 import smtplib
 import ssl
 
+from .contact_guard import ContactSubmission
+
 
 def _coerce_bool(value: str | None, default: bool = False) -> bool:
     if value is None:
@@ -15,6 +17,22 @@ def _coerce_bool(value: str | None, default: bool = False) -> bool:
 
 def _sanitize_header(value: str) -> str:
     return value.replace("\n", " ").replace("\r", " ").strip()
+
+
+def compose_contact_email(submission: ContactSubmission) -> tuple[str, str]:
+    """Return the subject and plain-text body for a validated submission."""
+    subject = " - ".join(
+        [submission.topic or "Foundation contact", submission.name or submission.email]
+    )
+    labelled = [
+        ("Name", submission.name),
+        ("Email", submission.email),
+        ("Organization", submission.organization),
+        ("Topic", submission.topic),
+    ]
+    body_lines = [f"{label}: {value}" for label, value in labelled if value]
+    body_lines += ["", submission.message]
+    return subject, "\n".join(body_lines)
 
 
 def send_contact_email(

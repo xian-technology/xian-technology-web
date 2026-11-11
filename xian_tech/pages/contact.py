@@ -3,6 +3,12 @@ from typing import Any
 import reflex as rx
 
 from ..components.common import icon_watermark_hover_card, page_layout, section
+from ..contact_guard import (
+    MAX_MESSAGE_LENGTH,
+    MAX_NAME_LENGTH,
+    MAX_ORGANIZATION_LENGTH,
+    MAX_TOPIC_LENGTH,
+)
 from ..state import State
 from ..theme import (
     ACCENT,
@@ -32,6 +38,13 @@ ERROR_COLOR = rx.color_mode_cond(light="#dc2626", dark="#f87171")
 ERROR_GLOW = rx.color_mode_cond(light="rgba(220, 38, 38, 0.25)", dark="rgba(248, 113, 113, 0.25)")
 
 
+
+_FIELD_MAX_LENGTHS = {
+    "name": MAX_NAME_LENGTH,
+    "organization": MAX_ORGANIZATION_LENGTH,
+    "topic": MAX_TOPIC_LENGTH,
+}
+
 def contact_page() -> rx.Component:
     """Contact page with message form."""
 
@@ -53,6 +66,7 @@ def contact_page() -> rx.Component:
         input_props = {
             "name": name,
             "id": name,
+            "max_length": _FIELD_MAX_LENGTHS.get(name, 254),
             "placeholder": placeholder,
             "type": field_type,
             "required": required,
@@ -113,6 +127,7 @@ def contact_page() -> rx.Component:
         text_area_props = {
             "name": "message",
             "id": "message",
+            "max_length": MAX_MESSAGE_LENGTH,
             "placeholder": "Tell us what you are working on, and how we can help.",
             "required": True,
             "rows": "6",
