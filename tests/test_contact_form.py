@@ -70,3 +70,51 @@ def test_smtp_failure_is_logged_not_shown(monkeypatch, caplog):
     assert "smtp.internal.example" not in state.contact_error
     assert "535" not in state.contact_error
     assert "smtp.internal.example" in caplog.text
+
+
+def test_live_email_validation_reports_missing_and_malformed_addresses():
+    state = make_state()
+    state.contact_status = "Sent"
+    state.contact_error = "old error"
+
+    state.set_contact_email("   ")
+    assert state.contact_email_error == "Email is required."
+    assert (state.contact_status, state.contact_error) == ("", "")
+
+    state.set_contact_email("not-an-email")
+    assert state.contact_email_error == app_state.INVALID_EMAIL_MESSAGE
+
+    state.set_contact_email(" ada@example.com ")
+    assert state.contact_email_error == ""
+    assert state.contact_form_email == " ada@example.com "
+
+
+def test_live_message_validation_requires_text():
+    state = make_state()
+    state.contact_error = "old error"
+
+    state.set_contact_message("  \n ")
+    assert state.contact_message_error == app_state.MISSING_MESSAGE_MESSAGE
+    assert state.contact_error == ""
+
+    state.set_contact_message("Hello")
+    assert state.contact_message_error == ""
+    assert state.contact_form_message == "Hello"
+
+
+def test_submission_is_ignored_while_one_is_in_flight_or_cooling_down(monkeypatch):
+    sent = []
+    monkeypatch.setattr(app_state, "send_contact_email", lambda *a, **k: sent.append(a))
+
+    busy = make_state("198.51.100.3")
+    busy.contact_submission_inflight = True
+    busy.contact_error = "unchanged"
+    submit(busy, FORM)
+    assert busy.contact_error == "unchanged"
+
+    cooling = make_state("198.51.100.4")
+    cooling.contact_cooldown_remaining = 12
+    submit(cooling, FORM)
+    assert cooling.contact_error == "Please wait 12 seconds before sending another message."
+    assert cooling.contact_submission_inflight is False
+    assert sent == []
