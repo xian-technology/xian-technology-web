@@ -35,6 +35,7 @@ EMAIL_PATTERN = re.compile(
     r"(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,63}$",
     re.IGNORECASE,
 )
+MISSING_EMAIL_MESSAGE = "Email is required."
 INVALID_EMAIL_MESSAGE = "Enter a valid email address (example: name@domain.com)."
 MISSING_MESSAGE_MESSAGE = "Please include a message so we can help."
 
@@ -57,15 +58,15 @@ class ContactValidation:
 
 def validate_contact_submission(submission: ContactSubmission) -> ContactValidation:
     """Check required fields, the email shape and length caps."""
-    email_error = "" if EMAIL_PATTERN.match(submission.email) else INVALID_EMAIL_MESSAGE
-    message_error = "" if submission.message else MISSING_MESSAGE_MESSAGE
+    email_error = contact_email_error(submission.email)
+    message_error = contact_message_error(submission.message)
     length_errors = contact_field_errors(
         name=submission.name,
         organization=submission.organization,
         topic=submission.topic,
         message=submission.message,
     )
-    message_error = length_errors.pop("message", message_error)
+    length_errors.pop("message", None)
     if length_errors:
         form_error = f"Please shorten these fields: {', '.join(sorted(length_errors))}."
     elif email_error or message_error:
@@ -75,13 +76,33 @@ def validate_contact_submission(submission: ContactSubmission) -> ContactValidat
     return ContactValidation(email_error, message_error, form_error)
 
 
+def contact_email_error(email: str) -> str:
+    """Explain what is wrong with a (stripped) email address, or return ""."""
+    if not email:
+        return MISSING_EMAIL_MESSAGE
+    return "" if EMAIL_PATTERN.match(email) else INVALID_EMAIL_MESSAGE
+
+
+def contact_message_error(message: str) -> str:
+    """Explain what is wrong with a (stripped) message, or return ""."""
+    if not message:
+        return MISSING_MESSAGE_MESSAGE
+    if len(message) > MAX_MESSAGE_LENGTH:
+        return _too_long(MAX_MESSAGE_LENGTH)
+    return ""
+
+
+def _too_long(limit: int) -> str:
+    return f"Keep this under {limit:,} characters."
+
+
 def contact_field_errors(
     *, name: str, organization: str, topic: str, message: str
 ) -> dict[str, str]:
     """Return a message per field that exceeds its length cap."""
     values = {"name": name, "organization": organization, "topic": topic, "message": message}
     return {
-        field: f"Keep this under {limit:,} characters."
+        field: _too_long(limit)
         for field, limit in _FIELD_LIMITS.items()
         if len(values[field]) > limit
     }

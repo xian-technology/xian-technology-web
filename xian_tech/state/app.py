@@ -9,11 +9,10 @@ from dotenv import load_dotenv
 
 from ..contact_email import compose_contact_email, send_contact_email
 from ..contact_guard import (
-    EMAIL_PATTERN,
-    INVALID_EMAIL_MESSAGE,
-    MISSING_MESSAGE_MESSAGE,
     ContactSubmission,
     contact_client_key,
+    contact_email_error,
+    contact_message_error,
     limiter_from_env,
     trusted_proxy_hops_from_env,
     validate_contact_submission,
@@ -539,28 +538,17 @@ class State(rx.State):
 
     def set_contact_email(self, value: str):
         """Live-validate the email field as the user types."""
-        email = value.strip()
         self.contact_form_email = value
         self.contact_status = ""
         self.contact_error = ""
-        if not email:
-            self.contact_email_error = "Email is required."
-            return
-        if not EMAIL_PATTERN.match(email):
-            self.contact_email_error = INVALID_EMAIL_MESSAGE
-            return
-        self.contact_email_error = ""
+        self.contact_email_error = contact_email_error(value.strip())
 
     def set_contact_message(self, value: str):
         """Live-validate the message field as the user types."""
-        message = value.strip()
         self.contact_form_message = value
         self.contact_status = ""
         self.contact_error = ""
-        if not message:
-            self.contact_message_error = MISSING_MESSAGE_MESSAGE
-            return
-        self.contact_message_error = ""
+        self.contact_message_error = contact_message_error(value.strip())
 
     def reset_contact_view(self):
         """Clear contact form UI state when visiting the page."""

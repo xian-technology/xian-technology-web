@@ -78,11 +78,11 @@ def test_live_email_validation_reports_missing_and_malformed_addresses():
     state.contact_error = "old error"
 
     state.set_contact_email("   ")
-    assert state.contact_email_error == "Email is required."
+    assert state.contact_email_error == contact_guard.MISSING_EMAIL_MESSAGE
     assert (state.contact_status, state.contact_error) == ("", "")
 
     state.set_contact_email("not-an-email")
-    assert state.contact_email_error == app_state.INVALID_EMAIL_MESSAGE
+    assert state.contact_email_error == contact_guard.INVALID_EMAIL_MESSAGE
 
     state.set_contact_email(" ada@example.com ")
     assert state.contact_email_error == ""
@@ -94,12 +94,39 @@ def test_live_message_validation_requires_text():
     state.contact_error = "old error"
 
     state.set_contact_message("  \n ")
-    assert state.contact_message_error == app_state.MISSING_MESSAGE_MESSAGE
+    assert state.contact_message_error == contact_guard.MISSING_MESSAGE_MESSAGE
     assert state.contact_error == ""
 
     state.set_contact_message("Hello")
     assert state.contact_message_error == ""
     assert state.contact_form_message == "Hello"
+
+
+def test_live_message_validation_applies_the_length_cap():
+    state = make_state()
+    limit = contact_guard.MAX_MESSAGE_LENGTH
+
+    state.set_contact_message(" " + "x" * limit + " ")
+    assert state.contact_message_error == ""
+
+    state.set_contact_message("x" * (limit + 1))
+    assert state.contact_message_error == "Keep this under 5,000 characters."
+
+
+def test_typing_and_submitting_report_the_same_field_errors(monkeypatch):
+    monkeypatch.setattr(app_state, "send_contact_email", lambda *a, **k: None)
+    oversized = "x" * (contact_guard.MAX_MESSAGE_LENGTH + 1)
+    for email, message in [("  ", oversized), ("not-an-email", "  ")]:
+        typed = make_state()
+        typed.set_contact_email(email)
+        typed.set_contact_message(message)
+        submitted = make_state("198.51.100.9")
+        submit(submitted, {**FORM, "email": email, "message": message})
+        assert submitted.contact_error == "Please fix the highlighted fields below."
+        assert (submitted.contact_email_error, submitted.contact_message_error) == (
+            typed.contact_email_error,
+            typed.contact_message_error,
+        )
 
 
 def test_submission_is_ignored_while_one_is_in_flight_or_cooling_down(monkeypatch):
