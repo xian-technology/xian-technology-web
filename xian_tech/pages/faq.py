@@ -160,8 +160,8 @@ FAQ_ITEMS = [
         "question": "Can I use Xian Technology for my own crypto project?",
         "answer": [
             (
-                "Yes. The software is open source, and the contracting engine is licensed under GPLv3. As long as you comply "
-                "with the license, you can use it and other parts of the stack in your own projects."
+                "Yes. The software is open source under the MIT license. You can use the contracting engine and the "
+                "other parts of the stack in your own projects, as long as you keep the copyright and license notice."
             )
         ],
     },

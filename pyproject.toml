@@ -4,6 +4,8 @@ version = "0.1.0"
 description = ""
 authors = [{ name = "Endogen", email = "endogen@xian.org" }]
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.14,<3.15"
 dependencies = [
     "python-dotenv>=1.2.2,<2.0.0",
