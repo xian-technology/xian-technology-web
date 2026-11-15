@@ -331,7 +331,7 @@ SCENARIO_BDS_RETRIEVAL = '''import requests
 from typing import Any
 
 # GraphQL endpoint exposed by BDS.
-BDS_GRAPHQL_URL = "http://node-ip:26657/graphql"
+BDS_GRAPHQL_URL = "http://node-ip:5000/graphql"
 
 # Query transfer events to a target address with cursor pagination.
 TRANSFER_EVENTS_QUERY = """
@@ -350,7 +350,7 @@ query TransfersForAddress($to: String!, $after: Cursor) {
       node {
         id
         txHash
-        blockNum
+        blockHeight
         dataIndexed
         data
       }
