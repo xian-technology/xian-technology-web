@@ -59,34 +59,23 @@ SEARCH_SECTIONS = [
     },
 ]
 
-SCENARIO_TRANSFER_SYNC = '''from time import monotonic, sleep
-from xian_py import Wallet, Xian, XianClientConfig
+SCENARIO_TRANSFER_SYNC = '''from xian_py import Wallet, Xian, XianClientConfig
 
 # Node RPC endpoint.
 NODE_URL = "http://node-ip:26657"
 
 
 def wait_for_tx(xian: Xian, tx_hash: str, timeout_seconds: int = 45) -> dict:
-    """Poll tx status until success, failure, or timeout."""
-    deadline = monotonic() + timeout_seconds
+    """Wait until a block holds the tx; raise if it failed.
 
-    while monotonic() < deadline:
-        # Check latest tx status from the node.
-        tx = xian.get_tx(tx_hash)
-
-        if tx.success:
-            return tx.raw
-
-        # "Not found" usually means tx is still propagating/indexing.
-        message = str(tx.message).lower()
-        if "not found" in message:
-            sleep(2)
-            continue
-
-        # Any other response is treated as terminal failure.
-        raise RuntimeError(f"Transaction failed: {tx}")
-
-    raise TimeoutError(f"Timed out waiting for tx {tx_hash}")
+    wait_for_tx keeps polling while the tx is pending and raises
+    TxTimeoutError when the timeout passes. A pending tx is not a failed
+    one: never resend it, or it can execute twice.
+    """
+    receipt = xian.wait_for_tx(tx_hash, timeout_seconds=timeout_seconds)
+    if not receipt.success:
+        raise RuntimeError(f"Transaction failed: {receipt.message}")
+    return receipt.raw
 
 
 def send_and_confirm(recipient: str, amount: int | str) -> dict:
@@ -120,26 +109,12 @@ NODE_URL = "http://node-ip:26657"
 
 
 async def wait_for_tx(client: XianAsync, tx_hash: str, timeout_seconds: int = 45) -> dict:
-    # Use loop time to avoid wall-clock drift issues.
-    deadline = asyncio.get_running_loop().time() + timeout_seconds
-
-    while asyncio.get_running_loop().time() < deadline:
-        # Fetch the latest transaction state.
-        tx = await client.get_tx(tx_hash)
-
-        if tx.success:
-            return tx.raw
-
-        # Keep polling while tx is still not indexed.
-        message = str(tx.message).lower()
-        if "not found" in message:
-            await asyncio.sleep(2)
-            continue
-
-        # Stop immediately on terminal failure.
-        raise RuntimeError(f"Transaction failed: {tx}")
-
-    raise TimeoutError(f"Timed out waiting for tx {tx_hash}")
+    # Polls while the tx is pending; raises TxTimeoutError after the timeout.
+    # A pending tx is not a failed one: never resend it.
+    receipt = await client.wait_for_tx(tx_hash, timeout_seconds=timeout_seconds)
+    if not receipt.success:
+        raise RuntimeError(f"Transaction failed: {receipt.message}")
+    return receipt.raw
 
 
 async def transfer_with_confirmation(recipient: str, amount: int | str) -> dict:
