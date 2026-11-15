@@ -43,7 +43,7 @@ SDK_SEND_EXAMPLE = """from xian_py import Xian, Wallet, XianClientConfig
 wallet = Wallet()
 xian = Xian("http://node-ip:26657", wallet=wallet, config=XianClientConfig(vm_profile="xian_vm_v2"))
 
-result = xian.send(amount=10, to_address="recipient_address", mode="commit")
+result = xian.send(amount=10, to_address="recipient_address", wait_for_tx=True)
 print(f"Transaction successful: {bool(result.receipt and result.receipt.success)}")"""
 SDK_CONTRACT_EXAMPLE = """from xian_py import Xian, Wallet, XianClientConfig
 
@@ -54,7 +54,7 @@ result = xian.send_tx(
     contract="currency",
     function="transfer",
     kwargs={"to": "recipient_address", "amount": 100},
-    mode="commit",
+    wait_for_tx=True,
 )
 print(f"Success: {bool(result.receipt and result.receipt.success)}")"""
 SDK_BDS_STATE_QUERY = """query QueryState {

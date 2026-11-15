@@ -314,7 +314,7 @@ submit = xian.send_tx(
     SWAP_FUNCTION,
     kwargs,
     chi=chi,
-    mode="commit",
+    wait_for_tx=True,
 )
 if submit.receipt is None or not submit.receipt.success:
     raise RuntimeError(submit.receipt.message if submit.receipt else "submit failed")
