@@ -250,7 +250,7 @@ print(asyncio.run(send_and_confirm_ws("recipient_address", 5)))'''
 SCENARIO_CONTRACT_GUARDRAILS = '''from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from xian_runtime_types.decimal import ContractingDecimal
-from xian_py import Wallet, Xian, XianClientConfig
+from xian_py import Wallet, Xian, XianClientConfig, chi_to_supply
 
 NODE_URL = "http://node-ip:26657"
 
@@ -306,8 +306,9 @@ if simulated_tokens_out < EXPECTED_MIN_OUT:
         f"Expected at least {EXPECTED_MIN_OUT}, simulation returned {simulated_tokens_out}"
     )
 
-# 3) Use simulated chi usage as the tx chi budget for the real call.
-chi = int(simulation["chi_used"])
+# 3) Supply the simulated chi plus the SDK's fixed 2-chi margin, which absorbs
+#    a transaction that lands in between (execution charges only chi used).
+chi = chi_to_supply(int(simulation["chi_used"]))
 submit = xian.send_tx(
     DEX_CONTRACT,
     SWAP_FUNCTION,
@@ -607,7 +608,7 @@ def samples_page() -> rx.Component:
                             _ordered_step_item(1, "Simulate the exact tx payload."),
                             _ordered_step_item(2, "Read the predicted token-out delta from simulated state."),
                             _ordered_step_item(3, "Abort when simulated output is below expectation."),
-                            _ordered_step_item(4, "Set `chi` from simulation `chi_used`."),
+                            _ordered_step_item(4, "Set `chi` to `chi_to_supply(chi_used)`: the estimate plus a 2-chi margin."),
                             _ordered_step_item(5, "Submit the real `send_tx` call with that chi budget."),
                             spacing="2",
                             align_items="start",
