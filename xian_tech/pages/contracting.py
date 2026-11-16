@@ -213,20 +213,20 @@ HIGHLIGHTS = [
         "title": "Python-first by design",
         "icon": "code",
         "body": (
-            "No custom DSLs or transpilers. Contracts are idiomatic Python, making audits and upgrades straightforward "
-            "and letting teams use the language they already know."
+            "No custom DSLs or transpilers. Contracts are written in a deterministic subset of Python, so audits read "
+            "like ordinary code and teams use the language they already know."
         ),
         "detail": (
-            "Execution stays on the standard Python VM end to end, so there is no translation layer where semantics can drift "
-            "or opaque behavior can creep in."
+            "The Python source you deploy is what the chain stores. Every node compiles it with the same deterministic Xian "
+            "compiler, so there is no developer-built artifact whose behavior can drift from the code you reviewed."
         ),
     },
     {
         "title": "Native value semantics",
         "icon": "scale",
         "body": (
-            "We avoid bespoke integer abstractions for balances. The engine stays Python-native rather than inventing "
-            "a special-purpose blockchain language."
+            "We avoid bespoke integer abstractions for balances. Contracts keep Python's integer and decimal semantics "
+            "instead of a special-purpose blockchain language."
         ),
         "detail": (
             "Decimal-friendly value types keep amounts natural to read and reason about. Solidity-style integer scaling forces "
@@ -252,8 +252,8 @@ HIGHLIGHTS = [
             "or power entirely different use cases."
         ),
         "detail": (
-            "You can embed the engine inside a local app, test harness, or other runtime. Blockchain integration is a choice, "
-            "not a requirement."
+            "You can embed the engine inside a local app, a test harness, or the browser through WebAssembly. Blockchain "
+            "integration is a choice, not a requirement."
         ),
     },
     {
@@ -286,8 +286,8 @@ WHY_IT_MATTERS = [
         "title": "One Runtime, Fewer Moving Parts",
         "icon": "layers",
         "body": (
-            "No extra compiler is required in the core authoring path. If you already have Python, "
-            "you already have what you need to write and reason about contracts."
+            "There is no separate build step in the authoring path: you write Python and deploy the source. The one Xian "
+            "compiler ships inside the node, the test client, the linter, and the browser playground."
         ),
         "detail": (
             "Reducing toolchain depth lowers setup friction and avoids avoidable build-step failures in local and CI workflows."
@@ -297,12 +297,12 @@ WHY_IT_MATTERS = [
         "title": "Audit What Actually Runs",
         "icon": "check",
         "body": (
-            "The code developers review is expressed in the same language that executes. "
-            "There is no hidden source-to-bytecode language switch in between."
+            "Reviewers read the exact source that is stored on chain. Nodes compile it deterministically, "
+            "so there is no developer-built bytecode to trust."
         ),
         "detail": (
-            "Fewer translation boundaries means fewer places for semantic mismatch, edge-case compiler behavior, "
-            "or opaque transformations to hide."
+            "One compiler, shared by every node and every tool, defines the semantics in one place instead of a separately "
+            "versioned toolchain on each developer machine."
         ),
     },
     {
@@ -395,11 +395,11 @@ SEARCH_SECTIONS = [
     },
     {
         "title": "Benefits of the Xian Approach",
-        "subtitle": "Why the Xian direct-Python execution model reduces stack complexity and risk.",
+        "subtitle": "Why deploying Python source to one deterministic compiler reduces stack complexity and risk.",
         "category": "Technology",
         "badge": "Section",
         "href": "/contracting",
-        "keywords": ["No compiler", "Python runtime", "Simplicity", "Reliability", "Auditability"],
+        "keywords": ["No build step", "Python contracts", "Simplicity", "Reliability", "Auditability"],
     },
 ]
 
@@ -447,7 +447,7 @@ def contracting_page() -> rx.Component:
                     weight="bold",
                 ),
                 rx.text(
-                    "The heart of Xian is a native Python contracting engine—no transpilers, no second-class runtimes. Deterministic, chi-metered execution keeps performance predictable while making audits and upgrades straightforward.",
+                    "The heart of Xian is a contracting engine for Python smart contracts—no new language and no build step on your machine. Deterministic, chi-metered execution keeps performance predictable while making audits and upgrades straightforward.",
                     size="4",
                     color=TEXT_MUTED,
                     width="100%",
@@ -484,7 +484,7 @@ def contracting_page() -> rx.Component:
                             width="100%",
                         ),
                         rx.text(
-                            "The contracting engine executes pure Python contracts with deterministic rules and a chi-metered "
+                            "The contracting engine compiles and runs Python contracts with deterministic rules and a chi-metered "
                             "budget. It keeps developer ergonomics high without compromising on predictable execution.",
                             size="3",
                             color=TEXT_MUTED,
@@ -514,8 +514,9 @@ def contracting_page() -> rx.Component:
                         "while Vyper emerged as a Pythonic EVM alternative; both still compile to bytecode. Move, TON/Tact, "
                         "and Rust/Anchor also rely on explicit compile-and-deploy pipelines and more specialized blockchain "
                         "abstractions, which are often less straightforward for developers without direct blockchain experience. "
-                        "Xian’s core difference is a shorter path: contracts execute directly in the Python runtime (VM) "
-                        "without an additional source-language compiler stage.",
+                        "Xian’s core difference is a shorter path: you deploy the Python source itself, and every node "
+                        "compiles it with the same deterministic Xian compiler, so there is no compile-and-deploy pipeline "
+                        "to run on your side.",
                         size="3",
                         color=TEXT_MUTED,
                         line_height="1.7",
@@ -575,7 +576,7 @@ def contracting_page() -> rx.Component:
                     "Benefits of the Xian Approach",
                     rx.text(
                         "This approach is valuable because it removes avoidable complexity from the contract path. "
-                        "When execution stays in Python end to end, teams spend less energy on compiler plumbing and "
+                        "When the deployed artifact is the Python source itself, teams spend less energy on compiler plumbing and "
                         "more on contract correctness, testing, and security.",
                         size="3",
                         color=TEXT_MUTED,
