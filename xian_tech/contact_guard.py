@@ -13,6 +13,7 @@ import os
 import re
 import threading
 import time
+from math import isfinite
 from collections import OrderedDict
 from dataclasses import dataclass
 from typing import Callable, Mapping
@@ -188,7 +189,7 @@ def _env_number(name: str, default: float) -> float:
         value = float(raw) if raw else default
     except ValueError:
         return default
-    return value if value > 0 else default
+    return value if isfinite(value) and value > 0 else default
 
 
 def limiter_from_env() -> ContactRateLimiter:

@@ -41,19 +41,17 @@ Production (split-port):
 uv run reflex run --env prod
 ```
 
-The runtime is configured in `rxconfig.py`. The app sets `REFLEX_SSR=0`
-to disable server-side rendering and avoid hydration mismatches behind
-the reverse proxy. OG / Twitter meta tags are injected via Nginx
-instead.
+The runtime is configured in `rxconfig.py`. Set deployment URLs and ports
+explicitly for the hosting environment and place production services behind
+an HTTPS reverse proxy.
 
 ## Principles
 
 - **Brand site, not docs.** Public developer documentation belongs in
   `xian-docs-web`. This repo is for marketing, the public landing
   surface, the contact form, and the public roadmap view.
-- **Reflex with disabled SSR.** Hydration mismatches behind reverse
-  proxies are avoided by disabling SSR; OG meta tags are injected at
-  the proxy.
+- **Explicit runtime configuration.** Hosting URLs, ports, and reverse-proxy
+  behavior belong to the deployment configuration.
 - **Live data is optional.** The Fizzy-backed roadmap board loads from
   the Fizzy API when `FIZZY_TOKEN` is configured; without it the page
   still renders, just without live items.
@@ -64,8 +62,8 @@ instead.
 
 ## Configuration
 
-Local development loads `.env` from the project root via `dotenv` in
-`xian_tech/state.py`. These settings are only needed for live data and
+Local development loads `.env` through `dotenv` in
+`xian_tech/state/app.py`. These settings are only needed for live data and
 contact-form delivery; the static site renders without them.
 
 | Variable                                | Purpose                                                                     | Default                        |
@@ -89,11 +87,11 @@ contact-form delivery; the static site renders without them.
 | `CONTACT_RATE_GLOBAL_WINDOW_SECONDS`    | Window for the global contact limit                                         | `3600`                         |
 | `CONTACT_TRUSTED_PROXY_HOPS`            | Reverse proxies in front of the app; selects the client address from `X-Forwarded-For` (0 = socket peer) | `0`                            |
 
+Non-finite rate-limit values use the listed defaults.
+
 `rxconfig.py` exposes:
 
 - `app_name="xian_tech"`
-- `deploy_url`, `api_url` — set to the public-facing domain
-- `frontend_port=3000`, `backend_port=8000`
 - `plugins=[SitemapPlugin, TailwindV4Plugin]`
 
 ## Key Directories
@@ -128,9 +126,8 @@ uv run reflex run --env prod --frontend-only    # frontend-build smoke
   port 8000 with the same websocket headers.
 - The CSP must include `'unsafe-eval'` in `script-src`. Reflex bundles
   rely on `new Function`; blocking it breaks hydration.
-- OG / Twitter preview meta tags are injected at the Nginx layer rather
-  than rendered server-side; keep that path in mind when changing the
-  reverse proxy.
+- Home-page social preview metadata is defined in `xian_tech/data.py` and
+  registered in `xian_tech/xian_tech.py`.
 
 ## Requirements
 

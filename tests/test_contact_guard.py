@@ -103,6 +103,13 @@ def test_env_numbers_fall_back_on_missing_or_invalid_values(monkeypatch, raw, ex
     assert contact_guard._env_number("CONTACT_TEST_NUMBER", 7) == expected
 
 
+@pytest.mark.parametrize("raw", ["inf", "Infinity", "1e309"])
+def test_nonfinite_rate_limits_fall_back_instead_of_crashing_startup(monkeypatch, raw):
+    monkeypatch.setenv("CONTACT_RATE_PER_CLIENT", raw)
+    guard = contact_guard.limiter_from_env()
+    assert guard.allow("client")
+
+
 @pytest.mark.parametrize(("raw", "expected"), [("", 0), ("2", 2), ("x", 0), ("-1", 0)])
 def test_trusted_proxy_hops_from_env(monkeypatch, raw, expected):
     monkeypatch.setenv("CONTACT_TRUSTED_PROXY_HOPS", raw)
