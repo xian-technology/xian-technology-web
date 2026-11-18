@@ -23,8 +23,8 @@ roadmap integrations.
 
 - This is the brand site; developer documentation belongs in
   `xian-docs-web`, not in these pages.
-- The app runs with SSR disabled (see the root README); OG meta tags are
-  injected by the reverse proxy.
+- Home-page social metadata comes from `data.py` and the route registration
+  in `xian_tech.py`; deployment routing is described in the root README.
 
 ## Next
 
