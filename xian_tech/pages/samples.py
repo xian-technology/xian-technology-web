@@ -323,7 +323,7 @@ query TransfersForAddress($to: String!, $after: Cursor) {
     }
     edges {
       node {
-        id
+        rowId
         txHash
         blockHeight
         dataIndexed
@@ -384,7 +384,7 @@ def fetch_transfers(address: str) -> list[dict[str, Any]]:
     return rows
 
 
-def fetch_balance(address: str) -> str | None:
+def fetch_balance(address: str) -> Any:
     # Read current balance value from state table projection.
     key = f"currency.balances:{address}"
     data = run_query(BALANCE_QUERY, {"key": key})

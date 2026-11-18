@@ -74,7 +74,7 @@ SDK_BDS_EVENTS_QUERY = """query TransferEventQuery {
   ) {
     edges {
       node {
-        id
+        rowId
         dataIndexed
         data
         contract
